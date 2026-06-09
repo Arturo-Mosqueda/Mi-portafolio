@@ -262,28 +262,122 @@ button {
 /* =====================================================
    HOME
    ===================================================== */
-.home-main-grid {
+.home-hero-split {
   display: grid;
-  grid-template-columns: 1.12fr 0.88fr;
-  gap: 3.5rem;
-  margin-bottom: 3.5rem;
-  align-items: start;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
 }
-.home-left-col {
+.home-hero-left {
   display: flex;
   flex-direction: column;
 }
-.home-right-col {
+.home-hero-right {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 @media (max-width: 768px) {
-  .home-main-grid {
+  .home-hero-split {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-    margin-bottom: 2.5rem;
+    gap: 2rem;
   }
 }
+
+/* CAD Viewport Graphic */
+.cad-viewport {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 600px;
+  user-select: none;
+  cursor: grab;
+  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+.cad-viewport:active {
+  cursor: grabbing;
+}
+.cad-viewport:hover {
+  border-color: var(--fg-3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+body.light .cad-viewport:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.cad-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.cad-axis {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  pointer-events: none;
+  font-weight: 500;
+}
+.cad-overlay-text {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  color: var(--fg-2);
+  line-height: 1.4;
+  pointer-events: none;
+}
+.cad-object-wrap {
+  transform-style: preserve-3d;
+  animation: rotateCad 15s linear infinite;
+  pointer-events: none;
+}
+@keyframes rotateCad {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+.cad-object {
+  width: 64px;
+  height: 64px;
+  position: relative;
+  transform-style: preserve-3d;
+}
+.cad-object .face {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--fg);
+  background: rgba(255, 255, 255, 0.015);
+  opacity: 0.85;
+  transition: border-color var(--t);
+}
+body.light .cad-object .face {
+  border-color: var(--fg);
+  background: rgba(0, 0, 0, 0.005);
+}
+.cad-object .face.front  { transform: translateZ(32px); }
+.cad-object .face.back   { transform: rotateY(180deg) translateZ(32px); }
+.cad-object .face.left   { transform: rotateY(-90deg) translateZ(32px); }
+.cad-object .face.right  { transform: rotateY(90deg) translateZ(32px); }
+.cad-object .face.top    { transform: rotateX(90deg) translateZ(32px); }
+.cad-object .face.bottom { transform: rotateX(-90deg) translateZ(32px); }
 
 .home-intro {
   max-width: 600px;
@@ -497,13 +591,26 @@ body.light .skill-card:hover {
   line-height: 1.4;
 }
 
+/* Home Split Row (Education & Competencies) */
+.home-split-row {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3.5rem;
+  margin-top: 3.5rem;
+}
+@media (max-width: 768px) {
+  .home-split-row {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
 @media (min-width: 769px) {
-  .home-left-col {
+  .home-split-row > div:first-child {
     padding-right: 1.5rem;
   }
-  .home-right-col {
+  .home-split-row > div:last-child {
     border-left: 1px solid var(--line);
-    padding-left: 3rem;
+    padding-left: 3.5rem;
   }
 }
 

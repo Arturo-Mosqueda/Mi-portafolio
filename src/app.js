@@ -1,7 +1,7 @@
 // src/app.js
 
 // ─── DATA ────────────────────────────────────────────
-const DATA_VERSION = 'v9';
+const DATA_VERSION = 'v10';
 if (localStorage.getItem('v3_data_version') !== DATA_VERSION) {
   localStorage.setItem('v3_data_version', DATA_VERSION);
   localStorage.removeItem('v3_proj');
@@ -210,8 +210,9 @@ function pageHome() {
 
   $content.innerHTML = `
     <div class="page-in">
-      <div class="home-main-grid">
-        <div class="home-left-col">
+      <!-- Split Hero: Bio Left, CAD Viewport Right -->
+      <div class="home-hero-split">
+        <div class="home-hero-left">
           <p class="page-eyebrow">Portafolio Personal</p>
           <h1 class="page-title" style="margin-bottom: 1rem;">
             Jesús Arturo<br><strong>Mosqueda Lara</strong>
@@ -219,34 +220,41 @@ function pageHome() {
           <p class="page-lead" style="margin-bottom: 1.5rem; max-width: 100%;">
             Estudiante de Ingeniería Aeronáutica en la UNAQ con formación técnica en Mecatrónica. Especializado en diseño CAD/CAM, manufactura y automatización multidisciplinaria.
           </p>
-          <div class="cta-row" style="margin-top: 0; margin-bottom: 3.5rem;">
+          <div class="cta-row" style="margin-top: 0; margin-bottom: 1rem;">
             <button class="btn btn-solid" onclick="go('proyectos')">Proyectos ↗</button>
             <button class="btn btn-ghost" onclick="go('certificaciones')">Certificaciones ↗</button>
           </div>
-
-          <!-- Educación -->
-          <div>
-            <h2 class="home-sec-title">Educación</h2>
-            <div class="edu-list">${eduHTML}</div>
-          </div>
         </div>
-
-        <div class="home-right-col">
-          <!-- Habilidades Técnicas -->
-          <div>
-            <h2 class="home-sec-title" style="margin-top: 0; margin-bottom: 1rem; padding-bottom: 0.35rem;">Habilidades Técnicas</h2>
-            <div class="home-skills-grid" style="grid-template-columns: 1fr; gap: 0.75rem;">${skillsHTML}</div>
-          </div>
-
-          <!-- Competencias -->
-          <div style="margin-top: 3rem;">
-            <h2 class="home-sec-title">Competencias Profesionales</h2>
-            <ul class="comp-list">${compHTML}</ul>
+        <div class="home-hero-right">
+          <div class="cad-viewport">
+            <div class="cad-grid"></div>
+            <div class="cad-overlay-text">
+              CAD_VIEWPORT: ACTIVE<br>
+              TARGET: CSWP_SOLIDWORKS<br>
+              ROT_X: <span id="cad-rx">AUTO</span>°<br>
+              ROT_Y: <span id="cad-ry">AUTO</span>°
+            </div>
+            <div class="cad-axis">
+              <span style="color:#ff4a4a">X-AXIS</span>
+              <span style="color:#4aef4a">Y-AXIS</span>
+              <span style="color:#4a90ff">Z-AXIS</span>
+            </div>
+            <div class="cad-object-wrap">
+              <div class="cad-object">
+                <div class="face front"></div>
+                <div class="face back"></div>
+                <div class="face left"></div>
+                <div class="face right"></div>
+                <div class="face top"></div>
+                <div class="face bottom"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="home-stats" style="margin-top: 2rem;">
+      <!-- Stats Bar (Full Width) -->
+      <div class="home-stats" style="margin-top: 3.5rem;">
         <div class="stat-item">
           <span class="stat-num">${projects.length}</span>
           <span class="stat-label">Proyectos</span>
@@ -268,8 +276,26 @@ function pageHome() {
         </div>
       </div>
 
+      <!-- Habilidades Técnicas (Full Width Grid) -->
+      <div class="home-sec" style="margin-top: 0;">
+        <h2 class="home-sec-title">Habilidades Técnicas</h2>
+        <div class="home-skills-grid">${skillsHTML}</div>
+      </div>
+
+      <!-- Educación y Competencias (Split Row) -->
+      <div class="home-split-row" style="margin-top: 3.5rem;">
+        <div class="home-split-col">
+          <h2 class="home-sec-title">Educación</h2>
+          <div class="edu-list">${eduHTML}</div>
+        </div>
+        <div class="home-split-col">
+          <h2 class="home-sec-title">Competencias Profesionales</h2>
+          <ul class="comp-list">${compHTML}</ul>
+        </div>
+      </div>
+
       <!-- CV Descarga Banner -->
-      <div class="cv-download-banner" style="margin-top: 3.5rem;">
+      <div class="cv-download-banner" style="margin-top: 4rem;">
         <div>
           <h3 style="margin: 0; font-size: 0.95rem; font-weight: 500; color: var(--fg);">¿Necesitas una copia física?</h3>
           <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: var(--fg-2);">Descarga mi Currículum Vitae completo en formato PDF listo para imprimir.</p>
@@ -279,6 +305,9 @@ function pageHome() {
 
     </div>
   `;
+
+  // Inicializar visor 3D interactivo
+  initCadRotation();
 }
 
 // ─── PROJECTS ────────────────────────────────────────────
@@ -473,6 +502,36 @@ window.openPost = function(id) {
     </div>
   `;
 };
+
+function initCadRotation() {
+  const vp = document.querySelector('.cad-viewport');
+  const obj = document.querySelector('.cad-object-wrap');
+  if (!vp || !obj) return;
+  
+  vp.addEventListener('mousemove', (e) => {
+    obj.style.animation = 'none';
+    const rect = vp.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width/2;
+    const y = e.clientY - rect.top - rect.height/2;
+    const rotX = -(y / rect.height) * 85;
+    const rotY = (x / rect.width) * 85;
+    obj.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    
+    const $rx = document.getElementById('cad-rx');
+    const $ry = document.getElementById('cad-ry');
+    if ($rx) $rx.textContent = Math.round(rotX);
+    if ($ry) $ry.textContent = Math.round(rotY);
+  });
+  
+  vp.addEventListener('mouseleave', () => {
+    obj.style.transform = '';
+    obj.style.animation = 'rotateCad 15s linear infinite';
+    const $rx = document.getElementById('cad-rx');
+    const $ry = document.getElementById('cad-ry');
+    if ($rx) $rx.textContent = 'AUTO';
+    if ($ry) $ry.textContent = 'AUTO';
+  });
+}
 
 // ─── MODAL ───────────────────────────────────────────
 $mClose.onclick = () => $modal.classList.add('hidden');

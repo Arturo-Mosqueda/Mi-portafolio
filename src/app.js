@@ -1,7 +1,7 @@
 // src/app.js
 
 // ─── DATA ────────────────────────────────────────────
-const DATA_VERSION = 'v10';
+const DATA_VERSION = 'v11';
 if (localStorage.getItem('v3_data_version') !== DATA_VERSION) {
   localStorage.setItem('v3_data_version', DATA_VERSION);
   localStorage.removeItem('v3_proj');

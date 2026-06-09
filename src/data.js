@@ -47,9 +47,9 @@ const PROJECTS = [
   },
   {
     id: "fixture-sujecion-cnc",
-    title: "Fixture de Sujecion CNC",
-    description: "Proyecto integrador de Ingenieria Aeronautica. Diseno mecanico CAD de un fixture tipo prensa autocentrante para piezas complejas en maquinado CNC.",
-    tags: ["SolidWorks", "Diseno CAD", "CNC", "Manufactura"],
+    title: "Fixture Metrologico de Bujes",
+    description: "Proyecto integrador. Ingenieria Aeronautica en Manufactura (El Marques, Qro). Diseno y modelado CAD de un fixture metrologico para la sujecion y posicionamiento de bujes aeronauticos, orientado a mejorar la precision y repetibilidad de las inspecciones dimensionales (En proceso).",
+    tags: ["SolidWorks", "Diseno CAD", "Metrologia", "Aeronautica"],
     status: "concept",
     github: "",
     live: "",

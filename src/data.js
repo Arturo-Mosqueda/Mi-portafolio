@@ -8,7 +8,7 @@ const PROJECTS = [
     tags: ["JavaScript", "HTML5 Canvas", "Fisica", "NASA Data"],
     status: "live",
     date: "Octubre 2025",
-    github: "https://github.com/Arturo-Mosqueda",
+    github: "https://github.com/Arturo-Mosqueda/Mi-portafolio/tree/main/proyectos/simulador-asteroides",
     live: "./proyectos/simulador-asteroides/index.html",
     imageUrl: "./proyectos/simulador-asteroides/screenshot.png",
     fallbackUrl: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600&auto=format&fit=crop"
@@ -32,7 +32,7 @@ const PROJECTS = [
     tags: ["Electronica", "Microcontroladores", "IoT", "JavaScript"],
     status: "live",
     date: "Enero 2026",
-    github: "https://github.com/Arturo-Mosqueda",
+    github: "https://github.com/Arturo-Mosqueda/Mi-portafolio/tree/main/proyectos/garra-servomotor",
     live: "./proyectos/garra-servomotor/index.html",
     imageUrl: "./proyectos/garra-servomotor/screenshot.png",
     fallbackUrl: "https://images.unsplash.com/photo-1617791160505-6f006e121980?q=80&w=600&auto=format&fit=crop"

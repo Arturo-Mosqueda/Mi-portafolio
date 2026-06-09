@@ -255,8 +255,8 @@ function pageHome() {
         </div>
         <div class="stat-sep"></div>
         <div class="stat-item">
-          <span class="stat-num">${certifications.length}</span>
-          <span class="stat-label">Certificaciones</span>
+          <span class="stat-num">1</span>
+          <span class="stat-label">Certificación</span>
         </div>
         <div class="stat-sep"></div>
         <div class="stat-item">

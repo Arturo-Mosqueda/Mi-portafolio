@@ -262,26 +262,26 @@ button {
 /* =====================================================
    HOME
    ===================================================== */
-.home-hero-container {
+.home-main-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 3rem;
-  margin-bottom: 3rem;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: 3.5rem;
+  margin-bottom: 3.5rem;
   align-items: start;
 }
-.home-hero-left {
+.home-left-col {
   display: flex;
   flex-direction: column;
 }
-.home-hero-right {
+.home-right-col {
   display: flex;
   flex-direction: column;
 }
 @media (max-width: 768px) {
-  .home-hero-container {
+  .home-main-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
   }
 }
 
@@ -498,26 +498,12 @@ body.light .skill-card:hover {
 }
 
 @media (min-width: 769px) {
-  .home-hero-left {
+  .home-left-col {
     padding-right: 1.5rem;
   }
-  .home-hero-right {
+  .home-right-col {
     border-left: 1px solid var(--line);
-    padding-left: 2.5rem;
-  }
-}
-
-/* Home Split Row (Education & Competencies) */
-.home-split-row {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 4rem;
-  margin-top: 4rem;
-}
-@media (max-width: 768px) {
-  .home-split-row {
-    grid-template-columns: 1fr;
-    gap: 3rem;
+    padding-left: 3rem;
   }
 }
 

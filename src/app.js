@@ -1,7 +1,7 @@
 // src/app.js
 
 // ─── DATA ────────────────────────────────────────────
-const DATA_VERSION = 'v8';
+const DATA_VERSION = 'v9';
 if (localStorage.getItem('v3_data_version') !== DATA_VERSION) {
   localStorage.setItem('v3_data_version', DATA_VERSION);
   localStorage.removeItem('v3_proj');
@@ -210,8 +210,8 @@ function pageHome() {
 
   $content.innerHTML = `
     <div class="page-in">
-      <div class="home-hero-container">
-        <div class="home-hero-left">
+      <div class="home-main-grid">
+        <div class="home-left-col">
           <p class="page-eyebrow">Portafolio Personal</p>
           <h1 class="page-title" style="margin-bottom: 1rem;">
             Jesús Arturo<br><strong>Mosqueda Lara</strong>
@@ -219,18 +219,34 @@ function pageHome() {
           <p class="page-lead" style="margin-bottom: 1.5rem; max-width: 100%;">
             Estudiante de Ingeniería Aeronáutica en la UNAQ con formación técnica en Mecatrónica. Especializado en diseño CAD/CAM, manufactura y automatización multidisciplinaria.
           </p>
-          <div class="cta-row" style="margin-top: 0; margin-bottom: 1rem;">
+          <div class="cta-row" style="margin-top: 0; margin-bottom: 3.5rem;">
             <button class="btn btn-solid" onclick="go('proyectos')">Proyectos ↗</button>
             <button class="btn btn-ghost" onclick="go('certificaciones')">Certificaciones ↗</button>
           </div>
+
+          <!-- Educación -->
+          <div>
+            <h2 class="home-sec-title">Educación</h2>
+            <div class="edu-list">${eduHTML}</div>
+          </div>
         </div>
-        <div class="home-hero-right">
-          <h2 class="home-sec-title" style="margin-top: 0; margin-bottom: 1rem; padding-bottom: 0.35rem;">Habilidades Técnicas</h2>
-          <div class="home-skills-grid" style="grid-template-columns: 1fr; gap: 0.75rem;">${skillsHTML}</div>
+
+        <div class="home-right-col">
+          <!-- Habilidades Técnicas -->
+          <div>
+            <h2 class="home-sec-title" style="margin-top: 0; margin-bottom: 1rem; padding-bottom: 0.35rem;">Habilidades Técnicas</h2>
+            <div class="home-skills-grid" style="grid-template-columns: 1fr; gap: 0.75rem;">${skillsHTML}</div>
+          </div>
+
+          <!-- Competencias -->
+          <div style="margin-top: 3rem;">
+            <h2 class="home-sec-title">Competencias Profesionales</h2>
+            <ul class="comp-list">${compHTML}</ul>
+          </div>
         </div>
       </div>
 
-      <div class="home-stats">
+      <div class="home-stats" style="margin-top: 2rem;">
         <div class="stat-item">
           <span class="stat-num">${projects.length}</span>
           <span class="stat-label">Proyectos</span>
@@ -252,20 +268,8 @@ function pageHome() {
         </div>
       </div>
 
-      <!-- Educación y Competencias -->
-      <div class="home-split-row" style="margin-top: 2rem;">
-        <div class="home-split-col">
-          <h2 class="home-sec-title">Educación</h2>
-          <div class="edu-list">${eduHTML}</div>
-        </div>
-        <div class="home-split-col">
-          <h2 class="home-sec-title">Competencias Profesionales</h2>
-          <ul class="comp-list">${compHTML}</ul>
-        </div>
-      </div>
-
       <!-- CV Descarga Banner -->
-      <div class="cv-download-banner">
+      <div class="cv-download-banner" style="margin-top: 3.5rem;">
         <div>
           <h3 style="margin: 0; font-size: 0.95rem; font-weight: 500; color: var(--fg);">¿Necesitas una copia física?</h3>
           <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: var(--fg-2);">Descarga mi Currículum Vitae completo en formato PDF listo para imprimir.</p>

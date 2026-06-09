@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Impacto de Asteroides</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="simulation-container">
+        <div id="info" role="status">Haz clic en el globo para seleccionar un punto y presiona Enter para lanzar.</div>
+    </div>
+
+    <div id="controls-container">
+        <div class="control-section">
+            <h2>Cargar Asteroide Predefinido</h2>
+            <label for="predefined-asteroid">Selecciona un asteroide para cargar sus datos:</label>
+            <select id="predefined-asteroid"></select>
+        </div>
+
+        <div class="control-section">
+            <h2>Panel de Lanzamiento</h2>
+            <label for="custom-name">Nombre:</label>
+            <input type="text" id="custom-name" value="Mi Asteroide" autocomplete="off">
+            <label for="custom-diameter">Diámetro (km):</label>
+            <input type="number" id="custom-diameter" value="1" step="0.01" min="0.001">
+            <label for="custom-density">Densidad (kg/m³):</label>
+            <input type="number" id="custom-density" value="3000" step="10" min="300" max="9000">
+            <label for="custom-velocity">Velocidad (km/s):</label>
+            <input type="number" id="custom-velocity" value="20" step="0.1" min="1" max="75">
+            <label for="custom-lat">Latitud de Impacto:</label>
+            <input type="number" id="custom-lat" value="20.59" step="0.01" min="-90" max="90">
+            <label for="custom-lon">Longitud de Impacto:</label>
+            <input type="number" id="custom-lon" value="-103.35" step="0.01" min="-180" max="180">
+            <div id="launch-preview" class="launch-preview" aria-live="polite"></div>
+            <p id="launch-status" class="launch-status" role="status"></p>
+            <button id="launch-custom">Lanzar Asteroide</button>
+        </div>
+
+        <div class="control-section">
+            <h2>Iluminación Solar</h2>
+            <label for="utc-time">Hora UTC simulada:</label>
+            <input type="time" id="utc-time" value="12:00">
+            <p id="utc-info"></p>
+        </div>
+
+        <div class="control-section">
+            <h2>Análisis de Impacto</h2>
+            <div id="impact-map-frame">
+                <div id="impact-map-container">
+                    <div id="impact-marker"></div>
+                </div>
+            </div>
+            <button id="show-real-data" type="button" disabled>Ver datos reales del asteroide</button>
+            
+            <!-- NUEVOS PANELES DE RESULTADOS -->
+            <div id="human-impact-summary">
+                <!-- Se rellena tras el impacto -->
+            </div>
+            <div id="secondary-effects-container">
+                 <!-- Se rellena tras el impacto -->
+            </div>
+
+            <div id="damage-legend">Esperando impacto para estimar radios de daño...</div>
+            <div id="consequences">
+                <p>Esperando impacto para mostrar las consecuencias...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="real-data-modal" role="dialog" aria-modal="true" aria-labelledby="real-data-title">
+        <div class="real-data-card" id="real-data-dialog">
+            <div class="real-data-header">
+                <h3 id="real-data-title">Datos reales del asteroide</h3>
+                <button id="real-data-close" type="button">Cerrar</button>
+            </div>
+            <div class="real-data-body">
+                <p class="real-data-meta" id="real-data-meta"></p>
+                <p class="real-data-empty" id="real-data-empty">Lanza un asteroide de la lista para ver datos reales disponibles.</p>
+                <table class="real-data-table hidden" id="real-data-table">
+                    <tbody id="real-data-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

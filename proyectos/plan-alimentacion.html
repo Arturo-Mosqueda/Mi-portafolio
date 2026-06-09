@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Nutricional UNAQ</title>
+    <!-- Librería para exportar a imagen -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e74c3c;
+            --secondary: #34495e;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --border: #ddd;
+            --text: #333;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+            
+            /* Colores Macros */
+            --color-prot: #3498db;
+            --color-fat: #f1c40f;
+            --color-carb: #1abc9c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+            padding-bottom: 300px;
+        }
+
+        /* Layout Principal */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; color: var(--primary); }
+        h1 span { font-size: 0.6em; color: #7f8c8d; font-weight: normal; display: block; margin-top: 5px; }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-random { background: #e67e22; }
+        .btn-export { background: #27ae60; }
+        .btn-clear { background: #c0392b; }
+        .btn-add { background: #3498db; }
+        .btn-reset-recipes { background: #7f8c8d; font-size: 0.8rem; }
+        
+        /* Notificaciones */
+        #notification-area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .toast {
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 250px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Estructura del Grid Semanal */
+        .planner-wrapper {
+            overflow-x: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            /* Sticky Header Logic */
+            position: relative;
+        }
+
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, minmax(180px, 1fr));
+            gap: 8px;
+            min-width: 1200px; 
+        }
+
+        /* Encabezados Sticky */
+        .header-day {
+            text-align: center;
+            font-weight: bold;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            /* Sticky solo dentro del planner */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-cat {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: var(--secondary);
+            color: white;
+            border-radius: 6px;
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            padding: 10px 0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-total {
+            background: #2c3e50;
+            border: 2px solid #2c3e50;
+        }
+
+        /* Celdas de Comida */
+        .meal-slot {
+            background: #f8f9fa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            min-height: 140px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .meal-slot:hover {
+            border-color: #bdc3c7;
+            background: #fff;
+        }
+
+        .meal-slot.drag-over {
+            border-color: var(--accent);
+            background: #fdf2f0;
+        }
+
+        /* Celda de Totales */
+        .total-slot {
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            font-size: 0.8rem;
+            gap: 6px;
+        }
+
+        .stat-block {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-label { font-weight: bold; color: #555; font-size: 0.8rem; }
+        .stat-val { font-family: monospace; font-weight: bold; font-size: 0.85rem; }
+        
+        /* Barras de Progreso */
+        .progress-track {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        .fill-cal { background-color: var(--success); }
+        .fill-prot { background-color: var(--color-prot); }
+        .fill-fat { background-color: var(--color-fat); }
+        .fill-carb { background-color: var(--color-carb); }
+
+        .stat-status { font-size: 0.7em; text-align: center; margin-top: 2px; font-style: italic; color: #777;}
+
+
+        /* Tarjeta de Receta dentro del slot */
+        .recipe-card {
+            background: white;
+            border-left: 4px solid var(--accent);
+            padding: 10px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            margin-bottom: 6px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        
+        .recipe-card:active { cursor: grabbing; }
+        .recipe-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        .recipe-card h4 { margin: 0 0 4px 0; font-size: 0.95rem; color: #2c3e50; pointer-events: none; }
+        .recipe-card .meta { display: flex; justify-content: space-between; color: #7f8c8d; font-size: 0.75rem; font-weight: bold; pointer-events: none; }
+        .recipe-card .desc { margin-top: 4px; color: #95a5a6; font-size: 0.75rem; line-height: 1.3; pointer-events: none; }
+
+        /* Icono de imagen en la tarjeta pequeña */
+        .has-img-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 10px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 22px;
+            height: 22px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .recipe-card:hover .delete-btn { opacity: 1; }
+
+        /* Banco de Alimentos */
+        .food-bank {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .bank-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bank-header h2 { margin: 0; font-size: 1.4rem; }
+
+        .bank-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .bank-column {
+            background: #fdfdfd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        .bank-column h3 {
+            text-align: center;
+            border-bottom: 3px solid;
+            padding-bottom: 8px;
+            margin-top: 0;
+            font-size: 1rem;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+        .draggable-source {
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
+
+        /* Colores por Categoría */
+        .cat-desayuno { border-left-color: #f1c40f; } .col-desayuno h3 { border-color: #f1c40f; }
+        .cat-lunch { border-left-color: #3498db; } .col-lunch h3 { border-color: #3498db; }
+        .cat-comida { border-left-color: #e67e22; } .col-comida h3 { border-color: #e67e22; }
+        .cat-colacion { border-left-color: #9b59b6; } .col-colacion h3 { border-color: #9b59b6; }
+        .cat-cena { border-left-color: #2ecc71; } .col-cena h3 { border-color: #2ecc71; }
+        .cat-extra { border-left-color: #ff7675; } .col-extra h3 { border-color: #ff7675; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        /* Modales */
+        .modal {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 { margin-top: 0; color: var(--primary); margin-bottom: 15px; text-align: center;}
+        
+        /* Imagen en Modal */
+        .recipe-img-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .recipe-img-preview {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #eee;
+            border: 1px solid #ddd;
+        }
+
+        /* Botón mini de eliminar foto */
+        .btn-mini-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-mini-remove:hover {
+            background: #e74c3c;
+        }
+        
+        /* Input File personalizado */
+        .file-input-wrapper {
+            margin-bottom: 5px;
+            position: relative;
+        }
+        .file-input-wrapper input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px dashed #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Formulario Receta */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; font-size: 0.9rem; }
+        .form-group input[type="text"], 
+        .form-group input[type="number"], 
+        .form-group textarea, 
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+
+        .macros-row { display: flex; gap: 10px; }
+        .macros-row .form-group { flex: 1; }
+
+        .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+    </style>
+</head>
+<body>
+
+<div id="notification-area"></div>
+
+<!-- Modal de Confirmación -->
+<div id="confirm-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 400px; text-align: center;">
+        <h3 id="confirm-title">Confirmar</h3>
+        <p id="confirm-msg">¿Estás seguro?</p>
+        <div class="modal-actions" style="justify-content: center;">
+            <button class="btn" style="background:#95a5a6" onclick="closeConfirmModal()">Cancelar</button>
+            <button class="btn btn-clear" id="modal-confirm-btn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Receta (Ver/Editar) -->
+<div id="recipe-modal" class="modal-overlay">
+    <div class="modal">
+        <h3 id="recipe-modal-title">Detalles de la Receta</h3>
+        
+        <div class="form-group" id="image-upload-container">
+            <label>Foto del Platillo</label>
+            
+            <!-- Estado 1: Sin Imagen -->
+            <div id="upload-controls">
+                <div class="file-input-wrapper">
+                    <input type="file" id="recipe-img-input" accept="image/*" onchange="handleImageUpload(this)">
+                </div>
+                <small style="color: #888;">La imagen se guardará automáticamente en el navegador.</small>
+            </div>
+
+            <!-- Estado 2: Con Imagen -->
+            <div id="image-display" style="display:none;" class="recipe-img-container">
+                <img id="recipe-img-preview" class="recipe-img-preview" alt="Foto Receta">
+                <button class="btn-mini-remove" onclick="removeImage()" title="Eliminar foto">✕</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre del Platillo</label>
+            <input type="text" id="recipe-name">
+        </div>
+
+        <div class="form-group">
+            <label>Categoría</label>
+            <select id="recipe-cat">
+                <option value="desayuno">Desayuno</option>
+                <option value="lunch">Lunch</option>
+                <option value="comida">Comida</option>
+                <option value="colacion">Colación</option>
+                <option value="cena">Cena</option>
+                <option value="extra">Extra</option>
+            </select>
+        </div>
+
+        <div class="macros-row">
+            <div class="form-group">
+                <label>Calorías</label>
+                <input type="number" id="recipe-cal">
+            </div>
+            <div class="form-group">
+                <label>Prot (g)</label>
+                <input type="number" id="recipe-prot">
+            </div>
+        </div>
+        <div class="macros-row">
+            <div class="form-group">
+                <label>Grasas (g)</label>
+                <input type="number" id="recipe-fat">
+            </div>
+            <div class="form-group">
+                <label>Carbs (g)</label>
+                <input type="number" id="recipe-carbs">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Receta / Ingredientes / Notas</label>
+            <textarea id="recipe-desc" placeholder="Escribe aquí los ingredientes y pasos..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn" style="background:#95a5a6" onclick="closeRecipeModal()">Cancelar</button>
+            <button class="btn btn-export" onclick="saveRecipeFromModal()">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Dashboard Nutricional <span>Plan de Volumen: 3700-3900 kcal</span></h1>
+        </div>
+        <div class="controls">
+            <button class="btn btn-clear" onclick="askClearGrid()">
+                <span>🗑️</span> Limpiar
+            </button>
+            <button class="btn btn-random" onclick="randomizeWeek()">
+                <span>🎲</span> Azar
+            </button>
+            <button class="btn btn-export" onclick="exportImage()">
+                <span>📷</span> Foto
+            </button>
+            <button class="btn btn-reset-recipes" onclick="askResetRecipes()">
+                <span>⚠️</span> Reset Recetas
+            </button>
+        </div>
+    </header>
+
+    <!-- Área Principal: Calendario -->
+    <div id="capture-area" class="planner-wrapper">
+        <div class="weekly-grid" id="grid-container">
+            <!-- Headers y Filas generados con JS -->
+        </div>
+    </div>
+
+    <!-- Banco de Recetas -->
+    <div class="food-bank">
+        <div class="bank-header">
+            <h2>Banco de Recetas <small style="font-size:0.6em; color:#777; font-weight:normal">(Toca para ver/editar)</small></h2>
+            <button class="btn btn-add" onclick="openNewRecipeModal()"><span>➕</span> Crear Receta</button>
+        </div>
+        <div class="bank-categories" id="bank-container">
+            <!-- Se llena con JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATOS DEL PLAN Y METAS ---
+    const GOALS = {
+        minCal: 3700,
+        maxCal: 3900,
+        minProt: 140,
+        maxProt: 160,
+        minFat: 70,
+        maxFat: 75,
+        targetCarbs: 600
+    };
+
+    // Datos iniciales
+    const initialRecipesData = {
+        desayuno: [
+            { id: 'd1', name: "Huevos Revueltos Clásicos", cal: 485, p:25, g:17, c:61, desc: "3 huevos, espinaca, 3 tortillas, 1 plátano" },
+            { id: 'd2', name: "Licuado Masa Crítica", cal: 1200, p:68, g:41, c:152, desc: "500ml leche, 100g avena, 2 plátanos, crema cacahuate, proteína" },
+            { id: 'd3', name: "Chilaquiles Anabólicos", cal: 910, p:70, g:28, c:93, desc: "Totopos, 2 huevos, 120g pollo, frijoles" },
+            { id: 'd4', name: "Avena Pro con Huevo", cal: 730, p:39, g:31, c:78, desc: "60g avena leche + 3 huevos + fruta/nueces" },
+            { id: 'd5', name: "Norteño Machaca/Chorizo", cal: 740, p:46, g:29, c:75, desc: "Huevos con machaca, frijoles, tortillas" },
+            { id: 'd6', name: "Sándwich Integral Completo", cal: 455, p:36, g:11, c:55, desc: "2 pan, pavo, panela, vegetales, fruta" },
+            { id: 'd7', name: "Hot Cakes de Avena", cal: 500, p:20, g:10, c:87, desc: "Licuado de avena/huevo cocinado como hotcake" }
+        ],
+        lunch: [
+            { id: 'l1', name: "Ensalada Pasta Anabólica", cal: 815, p: 58, g: 15, c: 98, desc: "140g de pasta integral (peso en crudo), 160g de pechuga de pollo cocida deshebrada, 1 cda de mayonesa light y taza y media de vegetales mixtos." },
+            { id: 'l2', name: "Bowl Arroz Poke", cal: 680, p: 52, g: 12, c: 85, desc: "280g de arroz blanco (peso cocido), 2 latas de atún en agua (drenadas), 1/2 taza de chícharos y zanahoria, pepino al gusto y aderezo de soya-limón." },
+            { id: 'l3', name: "Pasta Mediterránea", cal: 790, p: 45, g: 24, c: 105, desc: "120g de pasta (peso crudo), 1 lata de atún en aceite (sin drenar o drenada parcialmente), 1/2 taza de garbanzos cocidos, tomate y 8 aceitunas negras." },
+            { id: 'l4', name: "Ceviche Soya Cítrico", cal: 650, p: 44, g: 24, c: 70, desc: "80g de soya texturizada (peso seco, hidratar con limón), verduras (tomate, cebolla, cilantro), 1/2 aguacate grande (aprox 100g) y 4 tostadas horneadas." },
+            { id: 'l5', name: "Tortitas Atún y Avena", cal: 550, p: 54, g: 12, c: 45, desc: "2 latas de atún en agua (drenadas), 60g de avena en hojuelas, 1 huevo entero y zanahoria rallada (mezclar y cocinar al sartén)." },
+            { id: 'l6', name: "Salpicón de Pollo", cal: 650, p: 50, g: 30, c: 45, desc: "180g de pollo cocido deshebrado, verduras (lechuga, tomate, rábano), 1 aguacate entero mediano y 1 paquete de galletas saladas (o 3 tostadas)." },
+            { id: 'l7', name: "Picadillo Res Seco", cal: 680, p: 35, g: 26, c: 75, desc: "150g de carne molida magra (90/10, peso crudo), 1 papa mediana picada (150g), verduras varias y 5 tortillas de maíz." },
+            { id: 'l8', name: "Burrito Monstruo", cal: 880, p: 48, g: 28, c: 115, desc: "1 tortilla de harina grande (tipo burrera), 150g de pollo cocido, 1 taza de arroz cocido, 1/2 taza de frijoles negros y 40g de queso tipo manchego." },
+            { id: 'l9', name: "Sándwich Triple", cal: 650, p: 48, g: 22, c: 65, desc: "3 rebanadas de pan integral, 160g de pechuga de pollo cocida, 1/3 de aguacate mediano (aprox 60g), espinaca y tomate." },
+            { id: 'l10', name: "Wraps Atún Aguacate", cal: 580, p: 52, g: 18, c: 55, desc: "2 tortillas integrales o de harina medianas, 2 latas de atún en agua (drenadas), 1/3 de aguacate mediano y verduras al gusto." },
+            { id: 'l11', name: "Ensalada Rusa Pollo", cal: 620, p: 45, g: 18, c: 70, desc: "150g de pollo cocido en cubos, 2 papas medianas cocidas en cubos (aprox 250g), 1/2 taza de mezcla de chícharos/zanahoria y 2 cdas de aderezo (mitad yogur griego, mitad mayonesa light)." },
+            { id: 'l12', name: "Avena Overnight", cal: 388, p: 11, g: 14, c: 60, desc: "60g de avena en hojuelas (cocida o remojada en agua), 1 manzana mediana picada y 15g de nueces (aprox. 4-5 mitades)." },
+            { id: 'l13', name: "Sándwich de Atún", cal: 395, p: 36, g: 3, c: 57, desc: "2 rebanadas de pan integral, 1.5 latas de atún en agua (drenadas), verduras al gusto y 1 manzana entera de acompañamiento." },
+            { id: 'l14', name: "Yogur Bowl", cal: 277, p: 18, g: 7, c: 37, desc: "200g de yogur griego descremado (o vegetal alto en proteína), 30g de granola casera/avena y 1 taza de fruta picada." },
+            { id: 'l15', name: "Burritos de Frijol", cal: 535, p: 23, g: 20, c: 68, desc: "2 tortillas de harina medianas, 1 taza de frijoles refritos (aprox 200g) y 40g de queso panela o fresco." },
+            { id: 'l16', name: "Fruta y Semillas", cal: 236, p: 7, g: 15, c: 21, desc: "1 naranja o manzana mediana y 30g de semillas de girasol, almendras o cacahuates." }
+        ],
+        comida: [
+            { id: 'c1', name: "Pollo Guisado c/ Arroz", cal: 678, p:57, g:8, c:91, desc: "150g pollo, 200g arroz, nopales, tortillas" },
+            { id: 'c2', name: "Tupper Bodybuilder", cal: 932, p:57, g:27, c:106, desc: "350g arroz, 175g carne, verduras" },
+            { id: 'c3', name: "Pasta Boloñesa", cal: 875, p:54, g:21, c:115, desc: "150g pasta, 120g carne, salsa, calabacitas" },
+            { id: 'c4', name: "Frijoles Potenciadas", cal: 721, p:36, g:15, c:112, desc: "200g frijoles, 30g tocino, 150g arroz, tortillas" },
+            { id: 'c5', name: "Papas a la Francesa", cal: 888, p:42, g:45, c:84, desc: "150g milanesa, 150g papas fritas" },
+            { id: 'c6', name: "Picadillo de Res", cal: 657, p:45, g:23, c:62, desc: "150g carne, papa, 150g arroz rojo" },
+            { id: 'c7', name: "Atún Clásico", cal: 364, p:31, g:5, c:48, desc: "1 lata, aceitunas, 150g arroz rojo" },
+            { id: 'c8', name: "Arroz Frito", cal: 760, p:66, g:26, c:61, desc: "200g arroz frito, 2 huevos, 150g pollo" },
+            { id: 'c9', name: "Huevos con Chorizo", cal: 1303, p: 73, g: 73, c: 90, desc: "6 huevos, 100g chorizo, 8 tortillas maíz" },
+            { id: 'c10', name: "Tacos Carne Aguacate", cal: 1537, p: 99, g: 83, c: 109, desc: "9 tortillas, 320g carne res, 1 aguacate, limón" },
+            { id: 'c11', name: "Tacos Dorados Frijol", cal: 1342, p: 29, g: 79, c: 138, desc: "8 tortillas fritas, 200g frijoles, 1 aguacate, crema, queso" },
+            { id: 'c12', name: "Tacos Dorados Atún", cal: 1386, p: 69, g: 78, c: 107, desc: "8 tortillas fritas, 2 latas atún, 1 aguacate, crema, queso" },
+            { id: 'c13', name: "Huevos con Tortillas", cal: 848, p: 49, g: 34, c: 88, desc: "6 huevos, 8 tortillas maíz" },
+            { id: 'c14', name: "Tortas Frijol Compuestas", cal: 1642, p: 71, g: 83, c: 162, desc: "3 bolillos, frijoles, 120g jamón, 90g queso, mayonesa, 1 aguacate" }
+        ],
+        colacion: [
+            { id: 'co1', name: "Batido Pre-Entreno", cal: 419, p:32, g:13, c:40, desc: "30g proteína, plátano, crema cacahuate" },
+            { id: 'co2', name: "Arroz con Leche", cal: 400, p:7, g:4, c:77, desc: "Casero, alta carga carbos" },
+            { id: 'co3', name: "Sándwich Dulce", cal: 360, p:20, g:6, c:58, desc: "Mermelada y requesón" },
+            { id: 'co4', name: "Fruta con Grasa", cal: 158, p:5, g:8, c:20, desc: "Papaya/piña + crema cacahuate o nueces" },
+            { id: 'co5', name: "Barra Amaranto", cal: 325, p:7, g:4, c:67, desc: "1-2 alegrías + 1 plátano" },
+            { id: 'co6', name: "Tortita Avena", cal: 246, p:19, g:4, c:34, desc: "Avena con claras/proteína" },
+            { id: 'co7', name: "Cereal con Leche", cal: 348, p:29, g:6, c:41, desc: "Cereal caja + leche + proteína" }
+        ],
+        cena: [
+            { id: 'ce1', name: "Molletes Proteicos", cal: 798, p:33, g:26, c:111, desc: "2 bolillos, 150g frijoles, panela, aguacate" },
+            { id: 'ce2', name: "Quesadillas Vegetales", cal: 406, p:21, g:18, c:39, desc: "3 quesadillas, panela, espinaca/nopal" },
+            { id: 'ce3', name: "Tacos de Frijol", cal: 592, p:23, g:24, c:77, desc: "4 tacos, panela, aguacate" },
+            { id: 'ce4', name: "Huevos Mexicana", cal: 492, p:26, g:17, c:58, desc: "2 huevos, tortillas, frijoles olla" },
+            { id: 'ce5', name: "Tostadas Atún/Frijol", cal: 446, p:36, g:17, c:40, desc: "3 tostadas, lechuga, aguacate" },
+            { id: 'ce6', name: "Sincronizadas", cal: 548, p:30, g:27, c:49, desc: "Jamón pavo, queso, aguacate" },
+            { id: 'ce7', name: "Cena Ligera Pescado", cal: 312, p:40, g:3, c:31, desc: "150g pescado, ensalada, tortillas" }
+        ],
+        extra: [
+            { id: 'ex1', name: "Licuado de Chocolate con Azúcar", cal: 680, p:21, g:18, c:110, desc: "500ml de leche, 4 cucharadas de azucar , 1 bolillo" }
+        ]
+    };
+    
+    // Almacenamos TODAS las recetas en estado para que sean editables y persistentes
+    let currentRecipes = {};
+
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const categories = ['desayuno', 'lunch', 'comida', 'colacion', 'cena', 'extra'];
+
+    // --- INICIALIZACIÓN ---
+    document.addEventListener('DOMContentLoaded', () => {
+        loadRecipesLibrary();
+        buildGrid();
+        buildBank();
+        loadState();
+        showNotification("¡Listo! Toca una receta para editarla.");
+    });
+
+    // Cargar librería de recetas (LocalStorage o Default)
+    function loadRecipesLibrary() {
+        const savedLibrary = localStorage.getItem('unaqAllRecipes_v4');
+        if(savedLibrary) {
+            currentRecipes = JSON.parse(savedLibrary);
+            
+            // Forzar la actualización si la versión local es vieja y no tiene 'extra'
+            // Opcional: podrías verificar la versión o simplemente fusionar
+            if(!currentRecipes.extra) {
+                currentRecipes.extra = initialRecipesData.extra;
+            }
+        } else {
+            // Clon profundo para no referenciar la const original
+            currentRecipes = JSON.parse(JSON.stringify(initialRecipesData));
+        }
+    }
+
+    function saveRecipesLibrary() {
+        // Manejo de errores de quota (Storage full)
+        try {
+            // Importante usar v4 para diferenciar versiones
+            localStorage.setItem('unaqAllRecipes_v4', JSON.stringify(currentRecipes));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                alert("¡Memoria llena! No se pudo guardar. Intenta borrar algunas recetas o usar imágenes más pequeñas.");
+            } else {
+                console.error("Error saving to localStorage", e);
+            }
+        }
+    }
+
+    function askResetRecipes() {
+        showConfirmModal("Resetear Recetas", "¿Volver a las recetas originales? Perderás cambios en nombres/fotos de las recetas base.", () => {
+            currentRecipes = JSON.parse(JSON.stringify(initialRecipesData));
+            saveRecipesLibrary();
+            buildBank();
+            showNotification("Recetas restauradas");
+        });
+    }
+
+    // 1. Construir la Rejilla Semanal
+    function buildGrid() {
+        const container = document.getElementById('grid-container');
+        container.innerHTML = ''; 
+        
+        container.appendChild(createDiv('header-cat', 'Hora/Día'));
+
+        days.forEach(day => {
+            container.appendChild(createDiv('header-day', day));
+        });
+
+        categories.forEach(cat => {
+            const catLabel = createDiv('header-cat', cat);
+            container.appendChild(catLabel);
+
+            days.forEach((day, index) => {
+                const slot = document.createElement('div');
+                slot.className = `meal-slot`;
+                slot.dataset.day = index;
+                slot.dataset.cat = cat;
+                slot.id = `slot-${index}-${cat}`;
+                
+                slot.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+                slot.addEventListener('drop', handleDrop);
+
+                container.appendChild(slot);
+            });
+        });
+
+        // Fila de TOTALES
+        const totalLabel = createDiv('header-cat header-total', 'TOTALES');
+        container.appendChild(totalLabel);
+
+        days.forEach((day, index) => {
+            const totalSlot = document.createElement('div');
+            totalSlot.className = 'total-slot';
+            totalSlot.id = `total-slot-${index}`;
+            totalSlot.innerHTML = '...';
+            container.appendChild(totalSlot);
+        });
+    }
+
+    // 2. Construir el Banco de Recetas
+    function buildBank() {
+        const container = document.getElementById('bank-container');
+        container.innerHTML = ''; 
+        
+        for (const [cat, items] of Object.entries(currentRecipes)) {
+            const col = document.createElement('div');
+            col.className = `bank-column col-${cat}`;
+            col.innerHTML = `<h3>${cat}</h3>`;
+
+            if(items) {
+                items.forEach((item) => {
+                    const card = createRecipeCard(item, cat);
+                    col.appendChild(card);
+                });
+            }
+
+            container.appendChild(col);
+        }
+    }
+
+    function createRecipeCard(item, cat) {
+        const div = document.createElement('div');
+        div.className = `draggable-source recipe-card cat-${cat}`;
+        div.draggable = true;
+        
+        div.onclick = function() { openRecipeModal(div, item); };
+
+        let imgIndicator = item.img ? '<span class="has-img-indicator">📷</span>' : '';
+
+        div.innerHTML = `
+            <h4>${item.name}</h4>
+            ${imgIndicator}
+            <div class="meta">
+                <span>🔥 ${item.cal}</span>
+                <span>💪 ${item.p}g</span>
+            </div>
+        `;
+        
+        div.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', JSON.stringify({ ...item, cat }));
+            div.style.opacity = '0.5';
+        });
+
+        div.addEventListener('dragend', () => {
+            div.style.opacity = '1';
+        });
+
+        return div;
+    }
+
+    function createDiv(cls, text) {
+        const d = document.createElement('div');
+        d.className = cls;
+        d.innerText = text;
+        return d;
+    }
+
+    // --- INTERACCIÓN ---
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+        const dataStr = e.dataTransfer.getData('text/plain');
+        if (!dataStr) return;
+
+        const data = JSON.parse(dataStr);
+        const slotCat = e.currentTarget.dataset.cat;
+        const target = e.currentTarget;
+
+        if (data.cat !== slotCat) {
+            showConfirmModal("Mezcla extraña", `Estás poniendo ${data.cat.toUpperCase()} en ${slotCat.toUpperCase()}. ¿Seguro?`, () => {
+                addMealToSlot(target, data);
+                saveState();
+                showNotification("Receta agregada fuera de horario");
+            });
+        } else {
+            addMealToSlot(target, data);
+            saveState();
+        }
+    }
+
+    function addMealToSlot(slot, data) {
+        slot.innerHTML = ''; 
+
+        const card = document.createElement('div');
+        card.className = `recipe-card cat-${data.cat}`;
+        card.onclick = function() { openRecipeModal(card, data); };
+
+        let imgIndicator = data.img ? '<span class="has-img-indicator">📷</span>' : '';
+
+        card.innerHTML = `
+            <button class="delete-btn" onclick="removeMeal(this, event)">×</button>
+            <h4>${data.name}</h4>
+            ${imgIndicator}
+            <div class="meta">
+                <span>${data.cal} kcal</span>
+                <span>P: ${data.p}g</span>
+            </div>
+            <div class="desc">${data.desc.substring(0,50)}${data.desc.length>50?'...':''}</div>
+        `;
+        
+        card.dataset.json = JSON.stringify(data);
+        slot.appendChild(card);
+    }
+
+    function removeMeal(btn, event) {
+        event.stopPropagation();
+        const slot = btn.parentElement.parentElement;
+        btn.parentElement.remove();
+        saveState();
+        showNotification("Comida eliminada");
+    }
+
+    function askClearGrid() {
+        showConfirmModal("Limpiar Semana", "¿Borrar todo el plan?", () => {
+            document.querySelectorAll('.meal-slot').forEach(slot => slot.innerHTML = '');
+            saveState();
+            showNotification("Semana reiniciada");
+        });
+    }
+
+    function randomizeWeek() {
+        let count = 0;
+        
+        // Iterar por categoría en lugar de por slot individualmente
+        categories.forEach(cat => {
+            const availableRecipes = currentRecipes[cat];
+            if (!availableRecipes || availableRecipes.length === 0) return;
+
+            // Obtener slots vacíos para esta categoría
+            const slots = [];
+            for(let i=0; i<7; i++) {
+                const slot = document.getElementById(`slot-${i}-${cat}`);
+                if (slot && slot.children.length === 0) {
+                    slots.push(slot);
+                }
+            }
+
+            if (slots.length === 0) return;
+
+            // Lógica de selección
+            let selectedRecipes = [];
+
+            // Si hay suficientes recetas para cubrir la semana sin repetir (y no es 'extra')
+            if (cat !== 'extra' && availableRecipes.length >= 7) {
+                // Estrategia: Barajar y tomar los necesarios
+                let pool = [...availableRecipes];
+                
+                // Algoritmo Fisher-Yates para barajar
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+                
+                // Tomar los necesarios para los slots vacíos
+                selectedRecipes = pool.slice(0, slots.length);
+
+            } else {
+                // Estrategia: "Smart Shuffle" (Barajar mazo, usar todo, rebarajar si falta)
+                // Esto minimiza repeticiones incluso en listas cortas
+                let needed = slots.length;
+                let pool = [];
+                
+                while (selectedRecipes.length < needed) {
+                    if (pool.length === 0) {
+                        // Rellenar pool y barajar
+                        pool = [...availableRecipes];
+                        for (let i = pool.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [pool[i], pool[j]] = [pool[j], pool[i]];
+                        }
+                    }
+                    selectedRecipes.push(pool.pop());
+                }
+            }
+
+            // Asignar a los slots
+            slots.forEach((slot, index) => {
+                if (selectedRecipes[index]) {
+                    addMealToSlot(slot, { ...selectedRecipes[index], cat: cat });
+                    count++;
+                }
+            });
+        });
+
+        saveState();
+        if(count > 0) showNotification(`${count} comidas generadas sin repetir (donde posible)`);
+        else showNotification("La semana ya estaba llena.");
+    }
+
+    // --- MODAL DE RECETAS ---
+    const recipeModal = document.getElementById('recipe-modal');
+    let currentEditingElement = null;
+    let isCreatingNew = false;
+    let originalDataId = null;
+    let currentBase64Img = ""; // Variable para guardar la imagen codificada
+
+    function openRecipeModal(element, dataObj) {
+        currentEditingElement = element;
+        isCreatingNew = false;
+        
+        let data = dataObj;
+        if (!data && element.dataset.json) {
+            data = JSON.parse(element.dataset.json);
+        }
+
+        if(!data) return;
+        originalDataId = data.id; 
+
+        fillModal(data);
+        document.getElementById('recipe-modal-title').innerText = "Editar / Ver Receta";
+        recipeModal.classList.add('active');
+    }
+
+    function openNewRecipeModal() {
+        isCreatingNew = true;
+        currentEditingElement = null;
+        originalDataId = 'custom_' + Date.now();
+        
+        fillModal({
+            id: originalDataId,
+            name: "",
+            cat: "comida",
+            cal: 0, p: 0, g: 0, c: 0,
+            desc: "",
+            img: ""
+        });
+        document.getElementById('recipe-modal-title').innerText = "Crear Nueva Receta";
+        recipeModal.classList.add('active');
+    }
+
+    // Manejador de subida de imágenes - OPTIMIZADO PARA AHORRAR ESPACIO
+    function handleImageUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        showNotification("Comprimiendo imagen...");
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Comprimir imagen usando canvas antes de guardar
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // REDUCIR TAMAÑO PARA QUE QUEPAN MÁS IMÁGENES (500px máx)
+                const MAX_WIDTH = 500;
+                const MAX_HEIGHT = 500;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Obtener base64 comprimido (JPEG calidad 0.6)
+                currentBase64Img = canvas.toDataURL('image/jpeg', 0.6); 
+                
+                // Mostrar preview Y OCULTAR INPUT
+                updateImageUI(true);
+                showNotification("Imagen lista");
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Función para limpiar la imagen
+    function removeImage() {
+        currentBase64Img = "";
+        document.getElementById('recipe-img-input').value = ""; // Reset input
+        updateImageUI(false);
+    }
+    
+    // Alternar entre modo "Subir" y modo "Ver/Borrar"
+    function updateImageUI(hasImage) {
+        const uploadControls = document.getElementById('upload-controls');
+        const imageDisplay = document.getElementById('image-display');
+        const imgPrev = document.getElementById('recipe-img-preview');
+        
+        if(hasImage && currentBase64Img) {
+            imgPrev.src = currentBase64Img;
+            uploadControls.style.display = 'none';
+            imageDisplay.style.display = 'block';
+        } else {
+            imgPrev.src = "";
+            uploadControls.style.display = 'block';
+            imageDisplay.style.display = 'none';
+        }
+    }
+
+    function fillModal(data) {
+        document.getElementById('recipe-name').value = data.name || "";
+        document.getElementById('recipe-cat').value = data.cat || "comida";
+        document.getElementById('recipe-cal').value = data.cal || 0;
+        document.getElementById('recipe-prot').value = data.p || 0;
+        document.getElementById('recipe-fat').value = data.g || 0;
+        document.getElementById('recipe-carbs').value = data.c || 0;
+        document.getElementById('recipe-desc').value = data.desc || "";
+        
+        // Reset file input
+        document.getElementById('recipe-img-input').value = "";
+
+        // Set image state
+        currentBase64Img = data.img || "";
+        updateImageUI(!!currentBase64Img);
+    }
+
+    function saveRecipeFromModal() {
+        const newData = {
+            id: originalDataId,
+            name: document.getElementById('recipe-name').value || "Sin Nombre",
+            cat: document.getElementById('recipe-cat').value,
+            cal: parseInt(document.getElementById('recipe-cal').value) || 0,
+            p: parseInt(document.getElementById('recipe-prot').value) || 0,
+            g: parseInt(document.getElementById('recipe-fat').value) || 0,
+            c: parseInt(document.getElementById('recipe-carbs').value) || 0,
+            desc: document.getElementById('recipe-desc').value || "",
+            img: currentBase64Img // Usamos la variable global donde se guardó la imagen procesada
+        };
+
+        // --- LÓGICA DE PERSISTENCIA ---
+        
+        let found = false;
+        
+        for (const catKey of Object.keys(currentRecipes)) {
+            const idx = currentRecipes[catKey].findIndex(r => r.id === newData.id);
+            if (idx !== -1) {
+                if (catKey !== newData.cat) {
+                    currentRecipes[catKey].splice(idx, 1);
+                    if(!currentRecipes[newData.cat]) currentRecipes[newData.cat] = [];
+                    currentRecipes[newData.cat].push(newData);
+                } else {
+                    currentRecipes[catKey][idx] = newData;
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+             if(!currentRecipes[newData.cat]) currentRecipes[newData.cat] = [];
+             currentRecipes[newData.cat].push(newData);
+        }
+
+        saveRecipesLibrary();
+        buildBank();
+
+        if(!isCreatingNew && currentEditingElement) {
+             currentEditingElement.dataset.json = JSON.stringify(newData);
+             if(currentEditingElement.closest('.meal-slot')) {
+                 addMealToSlot(currentEditingElement.parentElement, newData);
+                 saveState();
+             }
+        }
+        
+        showNotification("Guardado permanentemente.");
+        closeRecipeModal();
+    }
+
+    function closeRecipeModal() {
+        recipeModal.classList.remove('active');
+    }
+
+    // --- CÁLCULO DE TOTALES ---
+    function updateSummaries() {
+        for(let i=0; i<7; i++) {
+            let totalCal = 0;
+            let totalP = 0;
+            let totalG = 0;
+            let totalC = 0;
+
+            const daySlots = document.querySelectorAll(`.meal-slot[data-day="${i}"]`);
+            daySlots.forEach(slot => {
+                const card = slot.querySelector('.recipe-card');
+                if(card && card.dataset.json) {
+                    const data = JSON.parse(card.dataset.json);
+                    totalCal += (data.cal || 0);
+                    totalP += (data.p || 0);
+                    totalG += (data.g || 0);
+                    totalC += (data.c || 0);
+                }
+            });
+
+            renderDaySummary(i, totalCal, totalP, totalG, totalC);
+        }
+    }
+
+    function renderDaySummary(dayIndex, cal, p, g, c) {
+        const summarySlot = document.getElementById(`total-slot-${dayIndex}`);
+        if(!summarySlot) return;
+
+        let calColor = 'var(--primary)';
+        let calStatus = 'Falta';
+        if (cal >= GOALS.minCal && cal <= GOALS.maxCal) {
+            calColor = 'var(--success)';
+            calStatus = '¡Perfecto!';
+        } else if (cal > GOALS.maxCal) {
+            calColor = 'var(--danger)';
+            calStatus = `Exceso`;
+        }
+        const pctCal = Math.min((cal / GOALS.maxCal) * 100, 100);
+
+        const pctProt = Math.min((p / GOALS.maxProt) * 100, 100);
+        let protStatus = '';
+        if(p >= GOALS.minProt) protStatus = '✔';
+
+        const pctFat = Math.min((g / GOALS.maxFat) * 100, 100);
+        const pctCarb = Math.min((c / GOALS.targetCarbs) * 100, 100);
+
+        summarySlot.innerHTML = `
+            <div class="stat-block">
+                <div class="stat-row">
+                    <span class="stat-label">Kcal</span>
+                    <span class="stat-val" style="color:${calColor}">${cal}</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-cal" style="width: ${pctCal}%; background-color:${calColor}"></div>
+                </div>
+                <div class="stat-status">${calStatus}</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-row">
+                    <span class="stat-label">Prot ${protStatus}</span>
+                    <span class="stat-val">${p}g</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-prot" style="width: ${pctProt}%"></div>
+                </div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-row">
+                    <span class="stat-label">Grasa</span>
+                    <span class="stat-val">${g}g</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-fat" style="width: ${pctFat}%"></div>
+                </div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-row">
+                    <span class="stat-label">Carbs</span>
+                    <span class="stat-val">${c}g</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-carb" style="width: ${pctCarb}%"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- UI HELPERS ---
+    
+    function showNotification(msg) {
+        const area = document.getElementById('notification-area');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = msg;
+        area.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Confirm Modal Logic
+    const confirmModal = document.getElementById('confirm-modal');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    let onConfirmAction = null;
+
+    function showConfirmModal(title, msg, onConfirm) {
+        document.getElementById('confirm-title').innerText = title;
+        document.getElementById('confirm-msg').innerText = msg;
+        onConfirmAction = onConfirm;
+        confirmModal.classList.add('active');
+    }
+
+    function closeConfirmModal() {
+        confirmModal.classList.remove('active');
+        onConfirmAction = null;
+    }
+
+    modalConfirmBtn.addEventListener('click', () => {
+        if (onConfirmAction) onConfirmAction();
+        closeConfirmModal();
+    });
+
+    // --- PERSISTENCIA & EXPORTAR ---
+    
+    function saveState() {
+        const gridState = [];
+        document.querySelectorAll('.meal-slot').forEach(slot => {
+            const card = slot.querySelector('.recipe-card');
+            if (card) {
+                gridState.push({
+                    id: slot.id,
+                    data: JSON.parse(card.dataset.json)
+                });
+            }
+        });
+        localStorage.setItem('unaqPlanState_v4', JSON.stringify(gridState));
+        updateSummaries();
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem('unaqPlanState_v4');
+        if (saved) {
+            try {
+                const gridState = JSON.parse(saved);
+                gridState.forEach(item => {
+                    const slot = document.getElementById(item.id);
+                    if (slot) {
+                        addMealToSlot(slot, item.data);
+                    }
+                });
+            } catch(e) { console.error("Error loading state", e); }
+        }
+        updateSummaries();
+    }
+
+    function exportImage() {
+        showNotification("Generando imagen...");
+        const element = document.getElementById('capture-area');
+        const originalOverflow = element.style.overflow;
+        element.style.overflow = 'visible'; 
+        
+        html2canvas(element, {
+            scale: 2, 
+            backgroundColor: "#ffffff",
+            useCORS: true,
+            logging: false,
+            windowWidth: element.scrollWidth,
+            width: element.scrollWidth
+        }).then(canvas => {
+            element.style.overflow = originalOverflow;
+            const link = document.createElement('a');
+            link.download = `Plan_Semanal_UNAQ_${new Date().toISOString().slice(0,10)}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            showNotification("¡Imagen descargada!");
+        }).catch(err => {
+            element.style.overflow = originalOverflow;
+            showNotification("Error al generar imagen");
+            console.error(err);
+        });
+    }
+
+    // --- AUTO SCROLL AL ARRASTRAR ---
+    let scrollInterval = null;
+    const scrollSpeed = 15;
+    const scrollZone = 50; // px from edge
+
+    window.addEventListener('dragover', (e) => {
+        // Detectar si estamos cerca de los bordes
+        if (e.clientY < scrollZone) {
+            startScrolling(-1); // Arriba
+        } else if (e.clientY > window.innerHeight - scrollZone) {
+            startScrolling(1); // Abajo
+        } else {
+            stopScrolling();
+        }
+    });
+
+    window.addEventListener('dragend', stopScrolling);
+    window.addEventListener('drop', stopScrolling);
+
+    function startScrolling(direction) {
+        if (scrollInterval) return; // Ya está scrolleando
+        scrollInterval = setInterval(() => {
+            window.scrollBy(0, direction * scrollSpeed);
+        }, 16); // ~60fps
+    }
+
+    function stopScrolling() {
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+    }
+</script>
+
+</body>
+</html>

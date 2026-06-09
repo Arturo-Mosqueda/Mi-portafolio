@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arturo Mosqueda — Portafolio</title>
+  <meta name="description" content="Portafolio personal de Jesús Arturo Mosqueda Lara — Ing. Aeronáutica, Robótica, CAD, Programación.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Top Bar: name + socials + theme -->
+    <header id="top-bar"></header>
+
+    <!-- Nav Row -->
+    <nav id="nav-row"></nav>
+
+    <!-- Content -->
+    <main id="main">
+      <div id="content"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer">
+      <span id="footer-year"></span> Jesús Arturo Mosqueda Lara
+    </footer>
+
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-box">
+      <button id="modal-close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="src/data.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

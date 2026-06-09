@@ -1,0 +1,1 @@
+Para este proyecto nos enfocamos en una forma de comunicar un problema que en mi comunidad no se le da tanta importancia, ya que la misma no se ve tan grave en estos momentos, sin embargo, esta recopila esta información que demuestra como es preocupante este problema y el mismo permite múltiples consecuencias que serán graves en algunos 

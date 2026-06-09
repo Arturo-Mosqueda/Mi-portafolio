@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Garra Robótica 3-DOF — Sistema Mecatrónico</title>
+  <meta name="description" content="Simulación y control de garra robótica de 3 grados de libertad con cinemática inversa, comunicación serial y esquemático electrónico." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="app-header">
+    <div class="header-left">
+      <div class="logo-icon">⚙</div>
+      <div>
+        <h1 class="app-title">ROBOARM 3-DOF</h1>
+        <p class="app-subtitle">Sistema Mecatrónico de Control</p>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot"></span>
+        <span id="status-text">LISTO</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="ctrl-info">
+        <span class="ctrl-label">MCU</span>
+        <select id="mcu-select" class="mcu-select">
+          <option value="arduino">Arduino UNO</option>
+          <option value="pic">PIC18F4550</option>
+        </select>
+      </div>
+      <button id="btn-connect" class="btn-primary">CONECTAR</button>
+      <button id="btn-execute" class="btn-accent">EJECUTAR</button>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <main id="app-main">
+
+    <!-- PANEL IZQUIERDO: Garra de Control -->
+    <section class="panel" id="panel-control">
+      <div class="panel-header">
+        <h2>🎮 GARRA DE CONTROL</h2>
+        <span class="panel-tag">ENTRADA</span>
+      </div>
+
+      <!-- Canvas de la garra principal -->
+      <div class="canvas-wrapper" id="control-canvas-wrapper">
+        <canvas id="control-canvas" width="400" height="380"></canvas>
+        <div class="target-crosshair" id="target-indicator" style="display:none">
+          <span>TARGET</span>
+        </div>
+      </div>
+
+      <!-- Controles de ángulo -->
+      <div class="angle-controls">
+        <div class="angle-row">
+          <label class="angle-label">θ₁ <span class="angle-desc">Base</span></label>
+          <input type="range" id="theta1" min="-180" max="180" value="0" class="angle-slider" />
+          <span class="angle-value" id="theta1-val">0°</span>
+        </div>
+        <div class="angle-row">
+          <label class="angle-label">θ₂ <span class="angle-desc">Brazo</span></label>
+          <input type="range" id="theta2" min="-90" max="90" value="30" class="angle-slider" />
+          <span class="angle-value" id="theta2-val">30°</span>
+        </div>
+        <div class="angle-row">
+          <label class="angle-label">θ₃ <span class="angle-desc">Garra</span></label>
+          <input type="range" id="theta3" min="-90" max="90" value="-20" class="angle-slider" />
+          <span class="angle-value" id="theta3-val">-20°</span>
+        </div>
+      </div>
+
+      <!-- Input de posición target -->
+      <div class="target-box">
+        <p class="target-title">📍 Posición Objetivo (IK)</p>
+        <div class="target-inputs">
+          <label>X <input type="number" id="target-x" value="120" class="coord-input" /></label>
+          <label>Y <input type="number" id="target-y" value="0" class="coord-input" /></label>
+          <label>Z <input type="number" id="target-z" value="100" class="coord-input" /></label>
+          <button id="btn-solve-ik" class="btn-ik">RESOLVER IK</button>
+        </div>
+      </div>
+
+      <!-- Trayectorias -->
+      <div class="traj-box">
+        <p class="target-title">🔄 Trayectorias</p>
+        <div class="traj-btns">
+          <button class="btn-traj" data-traj="wave">Ola</button>
+          <button class="btn-traj" data-traj="circle">Círculo</button>
+          <button class="btn-traj" data-traj="pick">Recoger</button>
+          <button class="btn-traj" data-traj="home">Home</button>
+        </div>
+      </div>
+      <!-- Replay -->
+      <div class="traj-box replay-box">
+        <p class="target-title">&#9654; REPLAY</p>
+        <div class="replay-controls">
+          <button id="btn-replay" class="btn-replay" disabled>
+            &#9654; Reproducir (<span id="replay-count">0</span>)
+          </button>
+          <button id="btn-clear-replay" class="btn-small" style="color:#ef4444;border-color:rgba(239,68,68,0.4)">&#10005; Limpiar</button>
+        </div>
+        <p class="replay-hint">Ejecuta movimientos para grabarlos</p>
+      </div>
+    </section>
+
+    <!-- PANEL CENTRAL: Conversión IK + Microcontrolador -->
+    <section class="panel" id="panel-mcu">
+      <div class="panel-header">
+        <h2>⚡ MICROCONTROLADOR</h2>
+        <span class="panel-tag">PROCESAMIENTO</span>
+      </div>
+
+      <!-- Visualización conversión IK -->
+      <div class="ik-flow" id="ik-flow">
+        <div class="ik-step" id="ik-step-1">
+          <div class="ik-icon">📡</div>
+          <div class="ik-label">Coordenadas<br/><span class="ik-data" id="ik-coords">X=0 Y=0 Z=0</span></div>
+        </div>
+        <div class="ik-arrow anim-arrow" id="arrow-1">▶</div>
+        <div class="ik-step" id="ik-step-2">
+          <div class="ik-icon">🔢</div>
+          <div class="ik-label">Cinemática<br/>Inversa</div>
+        </div>
+        <div class="ik-arrow anim-arrow" id="arrow-2">▶</div>
+        <div class="ik-step" id="ik-step-3">
+          <div class="ik-icon">📐</div>
+          <div class="ik-label">Ángulos<br/>
+            <span class="ik-data" id="ik-angles">θ₁=0° θ₂=30° θ₃=-20°</span>
+          </div>
+        </div>
+        <div class="ik-arrow anim-arrow" id="arrow-3">▶</div>
+        <div class="ik-step" id="ik-step-4">
+          <div class="ik-icon">📶</div>
+          <div class="ik-label">Serial<br/><span class="ik-data" id="ik-serial">COM3 9600bd</span></div>
+        </div>
+      </div>
+
+      <!-- Esquemático Electrónico -->
+      <div class="schematic-box">
+        <p class="target-title">🔌 Esquemático Electrónico</p>
+        <canvas id="schematic-canvas" width="420" height="280"></canvas>
+      </div>
+
+      <!-- Monitor Serial -->
+      <div class="serial-monitor">
+        <p class="target-title">💬 Monitor Serial</p>
+        <div id="serial-log" class="serial-log"></div>
+        <div class="serial-input-row">
+          <input type="text" id="serial-input" class="serial-input" placeholder="Enviar comando..." />
+          <button id="btn-serial-send" class="btn-small">ENVIAR</button>
+        </div>
+      </div>
+
+      <!-- PWM Visualizer -->
+      <div class="pwm-box">
+        <p class="target-title">📊 Señales PWM</p>
+        <canvas id="pwm-canvas" width="420" height="100"></canvas>
+      </div>
+    </section>
+
+    <!-- PANEL DERECHO: Garra Simulada -->
+    <section class="panel" id="panel-sim">
+      <div class="panel-header">
+        <h2>🤖 GARRA SIMULADA</h2>
+        <span class="panel-tag">HARDWARE REAL</span>
+      </div>
+
+      <!-- Canvas 3D de la garra simulada -->
+      <div class="canvas-wrapper" id="sim-canvas-wrapper">
+        <canvas id="sim-canvas" width="400" height="380"></canvas>
+        <div class="sim-label">Vista Isométrica 3D</div>
+      </div>
+
+      <!-- Estado de servos -->
+      <div class="servo-status">
+        <p class="target-title">⚙️ Estado Servomotores</p>
+        <div class="servo-row">
+          <span class="servo-name">SERVO 1 — Base (θ₁)</span>
+          <div class="servo-bar-wrap">
+            <div class="servo-bar" id="servo-bar-1"></div>
+          </div>
+          <span class="servo-deg" id="servo-deg-1">0°</span>
+        </div>
+        <div class="servo-row">
+          <span class="servo-name">SERVO 2 — Brazo (θ₂)</span>
+          <div class="servo-bar-wrap">
+            <div class="servo-bar" id="servo-bar-2"></div>
+          </div>
+          <span class="servo-deg" id="servo-deg-2">30°</span>
+        </div>
+        <div class="servo-row">
+          <span class="servo-name">SERVO 3 — Garra (θ₃)</span>
+          <div class="servo-bar-wrap">
+            <div class="servo-bar" id="servo-bar-3"></div>
+          </div>
+          <span class="servo-deg" id="servo-deg-3">-20°</span>
+        </div>
+      </div>
+
+      <!-- Info de posición end-effector -->
+      <div class="ee-info">
+        <p class="target-title">📌 Posición Efector Final</p>
+        <div class="ee-coords">
+          <div class="ee-coord"><span>X</span><strong id="ee-x">0.0</strong></div>
+          <div class="ee-coord"><span>Y</span><strong id="ee-y">0.0</strong></div>
+          <div class="ee-coord"><span>Z</span><strong id="ee-z">0.0</strong></div>
+        </div>
+      </div>
+
+      <!-- Código generado -->
+      <div class="code-box">
+        <p class="target-title">💾 Código Generado</p>
+        <div class="code-tabs">
+          <button class="code-tab active" data-tab="arduino">Arduino</button>
+          <button class="code-tab" data-tab="pic">PIC C</button>
+        </div>
+        <pre id="code-output" class="code-output"></pre>
+        <button id="btn-copy-code" class="btn-small">📋 COPIAR</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- OVERLAY de animación IK -->
+  <div id="ik-overlay" class="ik-overlay" style="display:none">
+    <div class="ik-overlay-box">
+      <div class="ik-solving-anim">
+        <div class="ik-solving-ring"></div>
+        <span>Calculando Cinemática Inversa...</span>
+      </div>
+      <div class="ik-result" id="ik-result-display"></div>
+    </div>
+  </div>
+
+  <!-- ARDUINO / PIC CODE MODAL -->
+  <div id="code-modal" class="code-modal" style="display:none">
+    <div class="code-modal-inner">
+      <div class="code-modal-header">
+        <span id="code-modal-title" class="code-modal-title">📟 Código Microcontrolador</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="code-modal-copy" class="btn-small">📋 COPIAR</button>
+          <button id="code-modal-close" class="btn-small" style="color:#ef4444;border-color:#ef4444">✕ CERRAR</button>
+        </div>
+      </div>
+      <div class="code-modal-tabs">
+        <button class="code-tab active" data-mtab="arduino">Arduino C++</button>
+        <button class="code-tab" data-mtab="pic">PIC C (XC8)</button>
+        <button class="code-tab" data-mtab="proto">Protocolo Serial</button>
+      </div>
+      <pre id="code-modal-body" class="code-modal-body"></pre>
+    </div>
+  </div>
+
+  <script src="kinematics.js"></script>
+  <script src="renderer.js"></script>
+  <script src="schematic.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

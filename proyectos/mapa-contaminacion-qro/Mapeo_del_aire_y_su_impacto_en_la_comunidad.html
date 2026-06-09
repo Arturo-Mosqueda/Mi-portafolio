@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapeo Calidad del aire y su impacto en Querétaro</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f5f9;
+        }
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .title {
+            background-color: #3282b8;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .subtitle {
+            background-color: #bbe1fa;
+            color: #3282b8;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .map-info-container {
+            display: flex;
+            gap: 20px;
+        }
+        .map-container {
+            flex: 1;
+            min-height: 400px;
+        }
+        .information {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+        #map_queretaro {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+        }
+        .year-selector {
+            margin-bottom: 10px;
+        }
+        .year-selector select {
+            width: 100%;
+            padding: 5px;
+            font-size: 16px;
+        }
+        #yearInfo {
+            background-color: #f0f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        #yearInfo h3 {
+            margin-top: 0;
+            color: #3282b8;
+        }
+        #yearInfo ul {
+            padding-left: 20px;
+        }
+        /* Estilos para las pestañas */
+        .tabs {
+            overflow: hidden;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+        .tab:hover {
+            background-color: #ddd;
+        }
+        .tab.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Mapeo Calidad del aire y su impacto en Querétaro</div>
+        <div class="subtitle">La contaminación del aire afecta la salud humana, especialmente los sistemas respiratorio y cardiovascular. 
+            En Querétaro, las enfermedades crónicas no transmisibles, como la diabetes y las cardiovasculares, son las principales causas de muerte. 
+            La diabetes afecta al 10-12% de los adultos, y la hipertensión y el colesterol alto elevan el riesgo de problemas cardíacos.</div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="openTab(event, 'mapTab')">Mapa NOMs sobre calidad del aire y su cumplimiento </button>
+            <button class="tab" onclick="openTab(event, 'infoTab')">Impacto de la contaminacion del aire</button>
+            <button class="tab" onclick="openTab(event, 'contaminacionTab')">La contaminacion en queretaro</button>
+        </div>
+
+        <div id="mapTab" class="tabcontent" style="display:block;">
+            <div class="content">
+                <div class="map-info-container">
+                    <div class="map-container">
+                        <div class="year-selector">
+                            <select id="yearSelect" onchange="changeYear()">
+                                <!-- Las opciones se llenarán dinámicamente con JavaScript -->
+                            </select>
+                        </div>
+                        <div id="map_queretaro"></div>
+                    </div>
+                    <div class="information">
+                        <h2>Normas Oficiales Mexicanas sobre la calidad del aire</h2>
+                        <p></p>
+                        <p><strong>Las Normas Oficiales Mexicanas (NOMs) actúan como indicadores 
+                            que nos permiten medir la cantidad de contaminantes en el aire y 
+                            cuando se vuelven dañinos para la salud:</strong></p>
+                        <p><strong>Estos limites son:</strong> NOM-025-SSA1-2014 (PM10 y PM2.5):
+
+                            PM10: 75 µg/m³ (24 h), 40 µg/m³ (promedio anual).
+                            PM2.5: 45 µg/m³ (24 h), 12 µg/m³ (promedio anual).
+                            NOM-020-SSA1-2014 (Ozono O₃):
+                            
+                            0.070 ppm (8 horas).
+                            NOM-021-SSA1-2014 (Monóxido de carbono CO):
+                            
+                            11 ppm (8 horas).
+                            NOM-022-SSA1-2014 (Dióxido de azufre SO₂):
+                            
+                            0.075 ppm (1 hora), 0.025 ppm (24 horas).
+                            NOM-023-SSA1-2014 (Dióxido de nitrógeno NO₂):
+                            
+                            0.210 ppm (1 hora), 0.053 ppm (promedio anual).</p>
+                        <p><strong>Estas normas fueron los indicadores que ocupamos 
+                            para representar la cantidad de diferentes contaminantes 
+                            en la ciudad de queretaro a lo largo de 5 años. Fuente: https://www.gob.mx/inecc/documentos/investigaciones-2017-2013-en-materia-de-contaminacion-y-salud-ambiental-rev1?state=published
+                         </strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="infoTab" class="tabcontent">
+            <h2>Impacto de la creciente contaminacion del aire en la poblacion Queretana.</h2>
+            <p></p>
+            <p>Los factores de riesgo y enfermedades que actualmente Querétaro sufre son bastantes, introduciré las que tienen una directa relación con la contaminación del aire, y por consiguiente afectan directamente a la comunidad queretana, en caso de que la contaminación del aire continúe estas se verán mas graves con el paso de los años y a su vez provocara riesgos sanitarios:
+                
+            <h3></h3>
+            <ul>
+                <li>Obesidad: Mas de un 30% sufre de sobrepeso u obesidad y va en crecimiento, la gente que sufre esta condición se vuelve mas susceptible a experimentar problemas relacionados con otras enfermedades</li>
+                <li>Infecciones respiratorias (IRAs): incluyen faringitis, bronquitis y estas afectan mayormente a niños y ancianos.</li>
+                <li>Asma: el asma es una enfermedad que afecta a personas de distintas edades, siendo una enfermedad con bastantes complicaciones y difícil de curar</li>
+                <li>Enfermedades infecciosas: las infecciones son problemas un tanto mas controlados, sin embargo, siguen sufriendo complicaciones en tanto a su tratamiento en algunos casos entre estas esta el dengue, que es un problema con gran incidencia en Qro.</li>
+                <li>Infecciones Gastrointestinales: estas son comunes en áreas urbanas por la contaminación y aglomeración de insectos y agentes extraños portadores de infecciones.</li>
+                <li>Enfermedades mentales: Se ha comprobado que las enfermedades mentales proliferan gracias a diversos factores y uno de ellos es la contaminación.</ul>
+
+                    <figure>
+                        <img src="Gráficas.jpeg" 
+                             alt="Calidad del Aire en Querétaro (Porcentaje de Días)" 
+                             style="width: 500px; height: auto;">
+                        <figcaption>Calidad del Aire en Querétaro (Porcentaje de Días).Fuente:INEGI</figcaption>
+                    </figure>
+
+</li>
+        </div>
+
+        <div id="contaminacionTab" class="tabcontent">
+            <h2>Contaminación del Aire en Querétaro</h2>
+            <p>Querétaro enfrenta desafíos significativos en cuanto a la calidad del aire:</p>
+            <ul>
+                <li>Las principales fuentes de contaminación son el tráfico vehicular, la industria y la construcción.</li>
+                <li>Las partículas PM2.5 y PM10 son los contaminantes más preocupantes en la ciudad.</li>
+                <li>El ozono también representa un problema, especialmente durante los meses más cálidos.</li>
+            </ul>
+            <h3>Impactos en la Salud</h3>
+            <p>La contaminación del aire en Querétaro está asociada con:</p>
+            <ul>
+                <li>Aumento de enfermedades respiratorias como asma y bronquitis.</li>
+                <li>Mayor riesgo de enfermedades cardiovasculares.</li>
+                <li>Impactos negativos en el desarrollo cognitivo de los niños.</li>
+            </ul>
+            <h3>Medidas de Mitigación</h3>
+            <p>El gobierno de Querétaro ha implementado varias medidas para mejorar la calidad del aire:</p>
+            <ul>
+                <li>Promoción del uso de transporte público y bicicletas.</li>
+                <li>Regulaciones más estrictas para las emisiones industriales.</li>
+                <li>Programas de reforestación urbana.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        let maps = {};
+        const qroMetroArea = {
+            north: 20.7500,
+            south: 20.5000,
+            east: -100.3000,
+            west: -100.5000
+        };
+
+        const yearlyData = {
+            '2014': [
+                { name: 'BOM', coords: [20.622700785389437, -100.35576192621998], exceedances: 5 },
+                { name: 'EPG', coords: [20.627572282925232, -100.40901673929378], exceedances: 5 },
+                { name: 'FEL', coords: [20.635103331874955, -100.459284430711], exceedances: 5 },
+                { name: 'CAM', coords: [20.553340241747254, -100.44478863688451], exceedances: 5 },
+                { name: 'MAR', coords: [20.613876498781746, -100.3292298367503], exceedances: 5 }
+            ],
+            '2015': [
+                { name: 'BOM', coords: [20.622700785389437, -100.35576192621998], exceedances: 5 },
+                { name: 'EPG', coords: [20.627572282925232, -100.40901673929378], exceedances: 5 },
+                { name: 'FEL', coords: [20.635103331874955, -100.459284430711], exceedances: 5 },
+                { name: 'CAM', coords: [20.553340241747254, -100.44478863688451], exceedances: 5 },
+                { name: 'MAR', coords: [20.613876498781746, -100.3292298367503], exceedances: 5 },
+                { name: 'UMMA1', coords: [20.608593158953944, -100.43016058303873], exceedances: 6 },
+                { name: 'UMMA2', coords: [20.585900562336956, -100.37826925529036], exceedances: 6 }
+            ],
+            '2016': [
+                { name: 'BOM', coords: [20.622700785389437, -100.35576192621998], exceedances: 5 },
+                { name: 'EPG', coords: [20.627572282925232, -100.40901673929378], exceedances: 5 },
+                { name: 'FEL', coords: [20.635103331874955, -100.459284430711], exceedances: 5 },
+                { name: 'CAM', coords: [20.553340241747254, -100.44478863688451], exceedances: 5 },
+                { name: 'MAR', coords: [20.613876498781746, -100.3292298367503], exceedances: 5 },
+                { name: 'UMMA1', coords: [20.608593158953944, -100.43016058303873], exceedances: 5 },
+                { name: 'UMMA2', coords: [20.585900562336956, -100.37826925529036], exceedances: 5 }
+            ],
+            '2018': [
+                { name: 'BOM', coords: [20.622700785389437, -100.35576192621998], exceedances: 5 },
+                { name: 'EPG', coords: [20.627572282925232, -100.40901673929378], exceedances: 3 },
+                { name: 'FEL', coords: [20.635103331874955, -100.459284430711], exceedances: 3 },
+                { name: 'CAM', coords: [20.553340241747254, -100.44478863688451], exceedances: 5 },
+                { name: 'MAR', coords: [20.613876498781746, -100.3292298367503], exceedances: 1 },
+                { name: 'UMMA1', coords: [20.608593158953944, -100.43016058303873], exceedances: 5 },
+                { name: 'UMMA2', coords: [20.585900562336956, -100.37826925529036], exceedances: 3 }
+            ]
+        };
+
+        function changeYear() {
+            const year = document.getElementById('yearSelect').value;
+            updateMap(year);
+            updateYearInfo(year);
+        }
+
+        function updateYearInfo(year) {
+            const yearInfo = document.getElementById('yearInfo');
+            const points = yearlyData[year];
+            let info = `<h3>Información del año ${year}</h3>`;
+            info += `<p><strong>Estaciones activas:</strong> ${points.length}</p>`;
+            info += `<p><strong>Contaminantes que sobrepasaron la norma:</strong></p><ul>`;
+            points.forEach(point => {
+                info += `<li>${point.name}: ${point.exceedances} contaminantes</li>`;
+            });
+            info += `</ul>`;
+            yearInfo.innerHTML = info;
+        }
+
+        function updateMap(year) {
+            const currentMap = maps.queretaro;
+            if (!currentMap) return;
+
+            currentMap.eachLayer((layer) => {
+                if (layer instanceof L.CircleMarker) {
+                    currentMap.removeLayer(layer);
+                }
+            });
+
+            const points = yearlyData[year];
+            points.forEach(point => {
+                if (point.coords[0] >= qroMetroArea.south && 
+                    point.coords[0] <= qroMetroArea.north && 
+                    point.coords[1] >= qroMetroArea.west &&
+                    point.coords[1] <= qroMetroArea.east) {
+                    const radius = point.exceedances * 5; // Increased multiplier for larger circles
+                    const circle = L.circleMarker(point.coords, {
+                        radius: radius,
+                        fillColor: getColor(point.exceedances),
+                        color: '#000',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    })
+                    .addTo(currentMap)
+                    .bindPopup(`${point.name}<br>Contaminantes que sobrepasaron la norma: ${point.exceedances}`);
+                }
+            });
+        }
+
+        function getColor(exceedances) {
+            return exceedances > 5 ? '#8B0000' :
+                   exceedances > 4 ? '#FF4500' :
+                   exceedances > 3 ? '#FFA500' :
+                   exceedances > 2 ? '#FFD700' :
+                   exceedances > 1 ? '#9ACD32' :
+                                     '#006400';
+        }
+
+        function initMap(mapType) {
+            const mapConfig = {
+                queretaro: { center: [20.5888, -100.3899], zoom: 12 }
+            };
+
+            const config = mapConfig[mapType];
+            maps[mapType] = L.map(`map_${mapType}`, {
+                center: config.center,
+                zoom: config.zoom,
+                maxBounds: [
+                    [qroMetroArea.south, qroMetroArea.west],
+                    [qroMetroArea.north, qroMetroArea.east]
+                ],
+                minZoom: 11,
+                maxZoom: 18
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(maps[mapType]);
+
+            if (mapType === 'queretaro') {
+                const initialYear = document.getElementById('yearSelect').value;
+                updateMap(initialYear);
+                updateYearInfo(initialYear);
+            }
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            if (tabName === 'mapTab' && !maps.queretaro) {
+                initMap('queretaro');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSelect = document.getElementById('yearSelect');
+            yearSelect.innerHTML = Object.keys(yearlyData).map(year => `<option value="${year}">${year}</option>`).join('');
+            yearSelect.value = '2014'; // Set initial year
+            openTab({currentTarget: document.querySelector('.tab')}, 'mapTab');
+        });
+    </script>
+</body>
+</html>

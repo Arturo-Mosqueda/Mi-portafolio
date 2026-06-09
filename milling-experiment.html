@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Fresado CNC — Experimento 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: #0b1329;
+      --border: rgba(56, 189, 248, 0.2);
+      --border-hover: rgba(56, 189, 248, 0.45);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14, 165, 233, 0.25);
+      --radius-lg: 14px;
+      --radius-md: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-tag {
+      background: rgba(14, 165, 233, 0.15);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      text-transform: uppercase;
+    }
+
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-back:hover {
+      border-color: var(--border-hover);
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      flex: 1;
+      height: calc(100vh - 60px);
+      min-height: 0;
+    }
+
+    /* Panel de Control */
+    .control-panel {
+      background-color: #080f20;
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-section {
+      background: rgba(17, 24, 39, 0.4);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-row label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .control-row label span {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #1e293b;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 10px var(--accent-glow);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #0284c7;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #334155;
+      border-color: var(--border-hover);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: #ef4444;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Panel de Estado / Feedback */
+    .status-panel {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: #020612;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .status-val-green { color: #10b981; }
+    .status-val-cyan { color: #0ea5e9; }
+    .status-val-yellow { color: #eab308; }
+
+    /* Contenedor 3D */
+    .viewport-container {
+      position: relative;
+      background: radial-gradient(ellipse at center, #0f172a 0%, #030712 100%);
+      width: 100%;
+      height: 100%;
+    }
+
+    #canvas3d {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .viewport-overlay {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(11, 19, 41, 0.75);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .viewport-instructions {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11, 19, 41, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    /* Responsividad */
+    @media (max-width: 900px) {
+      body {
+        overflow-y: auto;
+        height: auto;
+      }
+      .app-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .viewport-container {
+        height: 60vh;
+        min-height: 400px;
+      }
+      .control-panel {
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      🔧 SIMULADOR DE FRESADO CNC
+      <span class="header-tag">Experimental 3D</span>
+    </div>
+    <a href="index.html" class="btn-back">← Volver al Portafolio</a>
+  </header>
+
+  <div class="app-layout">
+    <!-- Panel de control de la fresadora -->
+    <div class="control-panel">
+      <!-- Sistema de Encendido -->
+      <div class="control-section">
+        <div class="section-title">HUsillo (Spindle)</div>
+        <div class="btn-group">
+          <button id="btn-spindle-on" class="btn-primary" onclick="toggleSpindle(true)">Encender</button>
+          <button id="btn-spindle-off" class="btn-secondary" onclick="toggleSpindle(false)" disabled>Apagar</button>
+        </div>
+        <div class="control-row">
+          <label>Velocidad del Husillo: <span id="val-rpm">12000 RPM</span></label>
+          <input type="range" id="input-rpm" min="2000" max="24000" step="500" value="12000" oninput="updateRPM(this.value)" />
+        </div>
+      </div>
+
+      <!-- Control de Ejes manual -->
+      <div class="control-section">
+        <div class="section-title">Posicionador de Ejes</div>
+        <div class="control-row">
+          <label>Eje X (Transversal): <span id="val-x">0.0 mm</span></label>
+          <input type="range" id="input-x" min="-30" max="30" step="0.5" value="0" oninput="moveToolX(parseFloat(this.value))" />
+        </div>
+        <div class="control-row">
+          <label>Eje Y (Longitudinal): <span id="val-y">0.0 mm</span></label>
+          <input type="range" id="input-y" min="-30" max="30" step="0.5" value="0" oninput="moveToolY(parseFloat(this.value))" />
+        </div>
+        <div class="control-row">
+          <label>Eje Z (Altura): <span id="val-z">30.0 mm</span></label>
+          <input type="range" id="input-z" min="-2.0" max="40.0" step="0.2" value="30" oninput="moveToolZ(parseFloat(this.value))" />
+        </div>
+      </div>
+
+      <!-- Programas CNC Automáticos -->
+      <div class="control-section">
+        <div class="section-title">Programas G-Code predefinidos</div>
+        <div class="btn-group">
+          <button id="btn-prog-circle" class="btn-secondary" onclick="runProgram('circle')">Corte Circular</button>
+          <button id="btn-prog-zigzag" class="btn-secondary" onclick="runProgram('zigzag')">Planeado Zig-Zag</button>
+        </div>
+        <div class="btn-group" style="margin-top: 8px;">
+          <button id="btn-prog-square" class="btn-secondary" onclick="runProgram('square')">Corte Cuadrado</button>
+          <button id="btn-reset-block" class="btn-danger" onclick="resetWorkpiece()">Reiniciar Bloque</button>
+        </div>
+      </div>
+
+      <!-- Monitor del Controlador -->
+      <div class="control-section">
+        <div class="section-title">Monitor CNC</div>
+        <div class="status-panel">
+          <div class="status-item">
+            <span>Controlador:</span>
+            <span class="status-val-green" id="mon-ctrl">LISTO</span>
+          </div>
+          <div class="status-item">
+            <span>Husillo:</span>
+            <span id="mon-spindle" style="color: #ef4444">APAGADO</span>
+          </div>
+          <div class="status-item">
+            <span>Coordenadas:</span>
+            <span class="status-val-cyan" id="mon-coords">X: 0.0 Y: 0.0 Z: 30.0</span>
+          </div>
+          <div class="status-item">
+            <span>Desbaste:</span>
+            <span class="status-val-yellow" id="mon-progress">0.00% removido</span>
+          </div>
+          <div class="status-item">
+            <span>Contacto:</span>
+            <span id="mon-contact" style="color: #64748b">NO DETECTADO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor de simulación 3D -->
+    <div class="viewport-container">
+      <div class="viewport-overlay">
+        G-CODE INTERPRETER: ACTIVE<br>
+        WORKSPACE: X60xY60xZ40 mm<br>
+        TOOL: 4.0mm Flat Endmill<br>
+        FEEDRATE: <span id="feed-value">F800</span> mm/min
+      </div>
+      <div class="viewport-instructions">
+        Usa click izquierdo y arrastra para rotar la cámara · Scroll para Zoom
+      </div>
+      <canvas id="canvas3d"></canvas>
+    </div>
+  </div>
+
+  <!-- Three.js y OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    // --- SIMULADOR CNC EXPERIMENTAL ---
+
+    let scene, camera, renderer, controls;
+    let spindleMesh, bitMesh, gantryMesh, zAxisMesh;
+    let voxels = [];
+    const voxelContainer = new THREE.Group();
+    let particles = [];
+    const particleContainer = new THREE.Group();
+
+    // Estado del Simulador
+    let state = {
+      toolX: 0.0,
+      toolY: 0.0,
+      toolZ: 30.0,
+      spindleOn: false,
+      spindleRPM: 12000,
+      targetRPM: 12000,
+      feedrate: 800,
+      voxelsRemoved: 0,
+      totalVoxels: 0,
+      programActive: false,
+      programProgress: 0,
+      programQueue: []
+    };
+
+    // Dimensiones del bloque de trabajo
+    const BLOCK_W = 20; // x-axis width
+    const BLOCK_D = 20; // z-axis depth
+    const BLOCK_H = 6;  // y-axis height
+    const VOXEL_SIZE = 1.0; // tamaño de cada voxel
+
+    // Inicialización del entorno
+    function init() {
+      const container = document.querySelector('.viewport-container');
+      const canvas = document.getElementById('canvas3d');
+
+      // Escena y Luces
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x050b18);
+      scene.fog = new THREE.FogExp2(0x050b18, 0.012);
+
+      // Cámara
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.set(35, 45, 55);
+
+      // Renderizador
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+
+      // Controles
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2 - 0.05; // No bajar de la mesa
+      controls.minDistance = 15;
+      controls.maxDistance = 180;
+      controls.target.set(0, 5, 0);
+
+      // Iluminación
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xffffff, 0.85);
+      mainLight.position.set(40, 60, 20);
+      mainLight.castShadow = true;
+      mainLight.shadow.mapSize.width = 1024;
+      mainLight.shadow.mapSize.height = 1024;
+      scene.add(mainLight);
+
+      const fillLight = new THREE.DirectionalLight(0x0ea5e9, 0.45);
+      fillLight.position.set(-40, 20, -20);
+      scene.add(fillLight);
+
+      // Renders Base: Mesa de fresado
+      buildTable();
+
+      // Construir la máquina CNC
+      buildCNCStructure();
+
+      // Construir el bloque de trabajo inicial
+      scene.add(voxelContainer);
+      scene.add(particleContainer);
+      resetWorkpiece();
+
+      // Evento Resize
+      window.addEventListener('resize', onWindowResize);
+
+      // Iniciar bucle de animación
+      animate();
+    }
+
+    // Mesa de trabajo
+    function buildTable() {
+      // Base metálica
+      const tableGeo = new THREE.BoxGeometry(60, 2, 60);
+      const tableMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        roughness: 0.4,
+        metalness: 0.85
+      });
+      const table = new THREE.Mesh(tableGeo, tableMat);
+      table.position.y = -1;
+      table.receiveShadow = true;
+      scene.add(table);
+
+      // Ranuras de sujeción (T-slots)
+      for (let x = -20; x <= 20; x += 10) {
+        if (x === 0) continue;
+        const slotGeo = new THREE.BoxGeometry(0.8, 0.2, 58);
+        const slotMat = new THREE.MeshBasicMaterial({ color: 0x020617 });
+        const slot = new THREE.Mesh(slotGeo, slotMat);
+        slot.position.set(x, 0.01, 0);
+        scene.add(slot);
+      }
+
+      // Prensa de sujeción (mordaza izquierda y derecha)
+      const jawsColor = 0x475569;
+      const jawMat = new THREE.MeshStandardMaterial({ color: jawsColor, roughness: 0.5, metalness: 0.7 });
+      
+      const jawL = new THREE.Mesh(new THREE.BoxGeometry(22, 2, 4), jawMat);
+      jawL.position.set(0, 1, -12);
+      scene.add(jawL);
+
+      const jawR = new THREE.Mesh(new THREE.BoxGeometry(22, 2, 4), jawMat);
+      jawR.position.set(0, 1, 12);
+      scene.add(jawR);
+    }
+
+    // Estructura de la máquina fresadora (Estructura de pórtico CNC)
+    function buildCNCStructure() {
+      gantryMesh = new THREE.Group();
+      scene.add(gantryMesh);
+
+      const structureMat = new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        roughness: 0.3,
+        metalness: 0.8
+      });
+      const axisGuideMat = new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        roughness: 0.2,
+        metalness: 0.95
+      });
+
+      // Postes verticales del pórtico (Gantry columns)
+      const columnL = new THREE.Mesh(new THREE.BoxGeometry(4, 32, 6), structureMat);
+      columnL.position.set(-25, 15, 0);
+      gantryMesh.add(columnL);
+
+      const columnR = new THREE.Mesh(new THREE.BoxGeometry(4, 32, 6), structureMat);
+      columnR.position.set(25, 15, 0);
+      gantryMesh.add(columnR);
+
+      // Viga superior horizontal (Bridge)
+      const bridge = new THREE.Mesh(new THREE.BoxGeometry(46, 6, 4), structureMat);
+      bridge.position.set(0, 28, 0);
+      gantryMesh.add(bridge);
+
+      // Barras de guía del eje X (rieles cilíndricos)
+      const railX1 = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 46, 12), axisGuideMat);
+      railX1.rotation.z = Math.PI / 2;
+      railX1.position.set(0, 27, 1);
+      gantryMesh.add(railX1);
+
+      const railX2 = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 46, 12), axisGuideMat);
+      railX2.rotation.z = Math.PI / 2;
+      railX2.position.set(0, 29, 1);
+      gantryMesh.add(railX2);
+
+      // Carro del eje Z (Z-Axis Carriage - se mueve en X)
+      zAxisMesh = new THREE.Group();
+      scene.add(zAxisMesh);
+
+      const carriage = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 4), structureMat);
+      carriage.position.set(0, 28, 2);
+      zAxisMesh.add(carriage);
+
+      // Motor paso a paso superior
+      const motorGeo = new THREE.BoxGeometry(4, 4, 4);
+      const motorMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 });
+      const motor = new THREE.Mesh(motorGeo, motorMat);
+      motor.position.set(0, 33, 2);
+      zAxisMesh.add(motor);
+
+      // Rieles de guía verticales (Eje Z)
+      const railZ1 = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 18, 12), axisGuideMat);
+      railZ1.position.set(-2, 22, 3);
+      zAxisMesh.add(railZ1);
+
+      const railZ2 = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 18, 12), axisGuideMat);
+      railZ2.position.set(2, 22, 3);
+      zAxisMesh.add(railZ2);
+
+      // Spindle / Cabezal del Motor
+      spindleMesh = new THREE.Group();
+      scene.add(spindleMesh);
+
+      // Cuerpo del husillo (cilindro metálico principal)
+      const bodyGeo = new THREE.CylinderGeometry(2, 2, 12, 16);
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: 0xe2e8f0,
+        roughness: 0.15,
+        metalness: 0.9,
+      });
+      const spindleBody = new THREE.Mesh(bodyGeo, bodyMat);
+      spindleBody.position.set(0, 18, 4.5);
+      spindleBody.castShadow = true;
+      spindleMesh.add(spindleBody);
+
+      // Portapinzas / Mandril giratorio (Collet Chuck)
+      const chuckGeo = new THREE.CylinderGeometry(0.8, 1, 2, 16);
+      const chuckMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.95 });
+      const chuck = new THREE.Mesh(chuckGeo, chuckMat);
+      chuck.position.set(0, 11.5, 4.5);
+      spindleMesh.add(chuck);
+
+      // Fresa de corte (Drill/Endmill)
+      const bitGeo = new THREE.CylinderGeometry(0.2, 0.2, 3, 8);
+      const bitMat = new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        metalness: 0.98,
+        roughness: 0.1
+      });
+      bitMesh = new THREE.Mesh(bitGeo, bitMat);
+      bitMesh.position.set(0, 9, 4.5); // La punta inferior de la fresa está a altura y = 7.5 relativa al spindleMesh
+      spindleMesh.add(bitMesh);
+    }
+
+    // Inicializar / Restaurar la pieza de trabajo (Bloque de cera/metal)
+    function resetWorkpiece() {
+      // Eliminar voxeles previos de la escena
+      while(voxels.length > 0) {
+        const v = voxels.pop();
+        voxelContainer.remove(v);
+        v.geometry.dispose();
+        v.material.dispose();
+      }
+
+      state.voxelsRemoved = 0;
+      updateMonProgress();
+
+      // Material del bloque de fresado (Estilo Cera Azul Machining)
+      const blockMat = new THREE.MeshStandardMaterial({
+        color: 0x0284c7, // Sky-blue machining wax
+        roughness: 0.7,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.95
+      });
+
+      // Rellenar volumen con pequeños voxeles de 1x1x1
+      const startX = -BLOCK_W / 2 + VOXEL_SIZE / 2;
+      const startZ = -BLOCK_D / 2 + VOXEL_SIZE / 2;
+      const startY = VOXEL_SIZE / 2;
+
+      for (let x = 0; x < BLOCK_W; x++) {
+        for (let z = 0; z < BLOCK_D; z++) {
+          for (let y = 0; y < BLOCK_H; y++) {
+            // Geometría del cubo
+            const vGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
+            const vMesh = new THREE.Mesh(vGeo, blockMat);
+            
+            const px = startX + x * VOXEL_SIZE;
+            const pz = startZ + z * VOXEL_SIZE;
+            const py = startY + y * VOXEL_SIZE;
+            
+            vMesh.position.set(px, py, pz);
+            vMesh.castShadow = true;
+            vMesh.receiveShadow = true;
+
+            // Almacenar metadatos del voxel
+            vMesh.userData = { gridX: x, gridY: y, gridZ: z };
+            
+            voxelContainer.add(vMesh);
+            voxels.push(vMesh);
+          }
+        }
+      }
+
+      state.totalVoxels = voxels.length;
+      updateMonProgress();
+    }
+
+    // Mover el pórtico y el husillo en 3D
+    function updateCNCModels() {
+      // El carro Z se desliza en X
+      zAxisMesh.position.x = state.toolX;
+
+      // El husillo completo se desliza sobre el carro Z verticalmente (eje Z)
+      // En la fresadora, la altura real de la punta de la herramienta es determinada por state.toolZ
+      // Hacemos calzar la punta del bitMesh (que en spindleMesh está en y = 7.5) con state.toolZ
+      spindleMesh.position.x = state.toolX;
+      spindleMesh.position.y = state.toolZ - 7.5;
+      spindleMesh.position.z = state.toolY; // En nuestra config 3D, movemos el husillo entero sobre Y de la fresa (Z del mundo 3D)
+    }
+
+    // Manual Slider Handlers
+    function moveToolX(val) {
+      if (state.programActive) return;
+      state.toolX = val;
+      document.getElementById('val-x').textContent = val.toFixed(1) + ' mm';
+      updateCNCModels();
+      checkMillingCollision();
+      updateMonCoords();
+    }
+
+    function moveToolY(val) {
+      if (state.programActive) return;
+      state.toolY = val;
+      document.getElementById('val-y').textContent = val.toFixed(1) + ' mm';
+      updateCNCModels();
+      checkMillingCollision();
+      updateMonCoords();
+    }
+
+    function moveToolZ(val) {
+      if (state.programActive) return;
+      state.toolZ = val;
+      document.getElementById('val-z').textContent = val.toFixed(1) + ' mm';
+      updateCNCModels();
+      checkMillingCollision();
+      updateMonCoords();
+    }
+
+    function updateRPM(val) {
+      state.targetRPM = parseInt(val);
+      document.getElementById('val-rpm').textContent = val + ' RPM';
+    }
+
+    function toggleSpindle(on) {
+      state.spindleOn = on;
+      document.getElementById('btn-spindle-on').disabled = on;
+      document.getElementById('btn-spindle-off').disabled = !on;
+      
+      const mon = document.getElementById('mon-spindle');
+      if (on) {
+        mon.textContent = 'ENCENDIDO';
+        mon.style.color = '#10b981';
+        logCNCMessage('Husillo iniciado a velocidad programada.');
+      } else {
+        mon.textContent = 'APAGADO';
+        mon.style.color = '#ef4444';
+        logCNCMessage('Parada de emergencia del husillo.');
+      }
+    }
+
+    // Detección de contacto y eliminación de material (milling)
+    function checkMillingCollision() {
+      if (!state.spindleOn) {
+        document.getElementById('mon-contact').textContent = 'NO DETECTADO';
+        document.getElementById('mon-contact').style.color = '#64748b';
+        return;
+      }
+
+      // La punta de la fresa está a (state.toolX, state.toolZ, state.toolY) en coordenadas del mundo
+      const toolPos = new THREE.Vector3(state.toolX, state.toolZ, state.toolY);
+      
+      // Radio de corte del bit (4mm de diámetro -> 2mm de radio, aprox 2 unidades en escala)
+      const cutRadius = 2.2;
+      let collisionDetected = false;
+
+      // Iterar de atrás hacia adelante para eliminar voxeles
+      for (let i = voxels.length - 1; i >= 0; i--) {
+        const voxel = voxels[i];
+        const dist = toolPos.distanceTo(voxel.position);
+
+        // Si la punta de la herramienta entra en el radio del voxel
+        if (dist <= cutRadius) {
+          collisionDetected = true;
+
+          // Lanzar chispas
+          spawnSparks(voxel.position.clone());
+
+          // Eliminar de la escena y del registro
+          voxelContainer.remove(voxel);
+          voxel.geometry.dispose();
+          voxel.material.dispose();
+          voxels.splice(i, 1);
+          state.voxelsRemoved++;
+        }
+      }
+
+      // Actualizar información
+      if (collisionDetected) {
+        document.getElementById('mon-contact').textContent = 'DESBASTANDO';
+        document.getElementById('mon-contact').style.color = '#eab308';
+        updateMonProgress();
+      } else {
+        document.getElementById('mon-contact').textContent = 'AIRE (SIN CORTE)';
+        document.getElementById('mon-contact').style.color = '#0ea5e9';
+      }
+    }
+
+    // Efecto visual de partículas / Chispas
+    function spawnSparks(pos) {
+      // Crear 6 pequeñas chispas naranjas
+      const count = 6;
+      const geo = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+      for (let i = 0; i < count; i++) {
+        const spark = new THREE.Mesh(geo, mat);
+        spark.position.copy(pos);
+        
+        // Direcciones aleatorias hacia arriba y afuera
+        spark.userData = {
+          velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 5,
+            Math.random() * 5 + 3,
+            (Math.random() - 0.5) * 5
+          ),
+          life: 1.0 // dura 1 segundo
+        };
+
+        particleContainer.add(spark);
+        particles.push(spark);
+      }
+    }
+
+    // Bucle de física de partículas
+    function updateParticles(delta) {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.userData.life -= delta;
+
+        if (p.userData.life <= 0) {
+          particleContainer.remove(p);
+          p.geometry.dispose();
+          p.material.dispose();
+          particles.splice(i, 1);
+        } else {
+          // Aplicar velocidad y gravedad
+          p.position.addScaledVector(p.userData.velocity, delta);
+          p.userData.velocity.y -= 9.8 * delta; // gravedad
+
+          // Reducir escala gradualmente
+          p.scale.setScalar(p.userData.life);
+        }
+      }
+    }
+
+    // --- MONITOREO LOGS ---
+    function updateMonCoords() {
+      document.getElementById('mon-coords').textContent = `X: ${state.toolX.toFixed(1)} Y: ${state.toolY.toFixed(1)} Z: ${state.toolZ.toFixed(1)}`;
+    }
+
+    function updateMonProgress() {
+      const pct = (state.voxelsRemoved / state.totalVoxels) * 100;
+      document.getElementById('mon-progress').textContent = `${pct.toFixed(2)}% removido`;
+    }
+
+    function logCNCMessage(msg) {
+      console.log("[CNC]:", msg);
+    }
+
+    // --- PROGRAMAS CNC AUTOMÁTICOS (G-Code) ---
+    function runProgram(type) {
+      if (state.programActive) return;
+
+      // Encender husillo obligatoriamente
+      toggleSpindle(true);
+
+      state.programActive = true;
+      state.programQueue = [];
+      document.getElementById('mon-ctrl').textContent = 'CORRIENDO';
+      document.getElementById('mon-ctrl').style.color = '#eab308';
+      disableInputs(true);
+
+      const feed = 900;
+      document.getElementById('feed-value').textContent = 'F' + feed;
+
+      // Generación de trayectoria
+      if (type === 'circle') {
+        // 1. Ir a posición segura por encima del bloque
+        state.programQueue.push({ x: 0, y: 0, z: 25 });
+        // 2. Posicionarse sobre el inicio del círculo
+        state.programQueue.push({ x: 10, y: 0, z: 25 });
+        // 3. Bajar herramienta en Z para penetrar (profundidad de corte = 2mm, Z=3.0)
+        state.programQueue.push({ x: 10, y: 0, z: 3.5 });
+        
+        // 4. Hacer interpolación circular (36 puntos)
+        for (let angle = 0; angle <= Math.PI * 2; angle += Math.PI / 18) {
+          const px = Math.cos(angle) * 10;
+          const py = Math.sin(angle) * 10;
+          state.programQueue.push({ x: px, y: py, z: 3.5 });
+        }
+        // 5. Retraer Z a plano seguro
+        state.programQueue.push({ x: 0, y: 0, z: 30 });
+      } 
+      else if (type === 'zigzag') {
+        // Planeado de superficie
+        state.programQueue.push({ x: -12, y: -12, z: 25 });
+        state.programQueue.push({ x: -12, y: -12, z: 4.5 }); // Profundidad de planeado
+        
+        let switchSide = false;
+        for (let y = -12; y <= 12; y += 4) {
+          if (!switchSide) {
+            state.programQueue.push({ x: 12, y: y, z: 4.5 });
+          } else {
+            state.programQueue.push({ x: -12, y: y, z: 4.5 });
+          }
+          switchSide = !switchSide;
+        }
+        state.programQueue.push({ x: 0, y: 0, z: 30 });
+      }
+      else if (type === 'square') {
+        state.programQueue.push({ x: -10, y: -10, z: 25 });
+        state.programQueue.push({ x: -10, y: -10, z: 3.0 });
+        state.programQueue.push({ x: 10, y: -10, z: 3.0 });
+        state.programQueue.push({ x: 10, y: 10, z: 3.0 });
+        state.programQueue.push({ x: -10, y: 10, z: 3.0 });
+        state.programQueue.push({ x: -10, y: -10, z: 3.0 });
+        state.programQueue.push({ x: 0, y: 0, z: 30 });
+      }
+    }
+
+    // Ejecución paso a paso del programa CNC
+    function tickProgram(delta) {
+      if (!state.programActive || state.programQueue.length === 0) return;
+
+      const target = state.programQueue[0];
+      const stepSpeed = 15.0 * delta; // Velocidad del avance CNC
+
+      // Mover herramienta gradualmente hacia el objetivo
+      const dx = target.x - state.toolX;
+      const dy = target.y - state.toolY;
+      const dz = target.z - state.toolZ;
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+      if (dist < 0.25) {
+        // Objetivo alcanzado, pasar al siguiente comando
+        state.toolX = target.x;
+        state.toolY = target.y;
+        state.toolZ = target.z;
+        state.programQueue.shift();
+        
+        if (state.programQueue.length === 0) {
+          // Fin del programa
+          state.programActive = false;
+          document.getElementById('mon-ctrl').textContent = 'LISTO';
+          document.getElementById('mon-ctrl').style.color = '#10b981';
+          disableInputs(false);
+          toggleSpindle(false); // Apagar husillo al terminar
+        }
+      } else {
+        // Avance en ejes
+        state.toolX += (dx / dist) * Math.min(stepSpeed, dist);
+        state.toolY += (dy / dist) * Math.min(stepSpeed, dist);
+        state.toolZ += (dz / dist) * Math.min(stepSpeed, dist);
+      }
+
+      // Sincronizar sliders manuales con el programa dinámico
+      syncSlidersToState();
+      updateCNCModels();
+      checkMillingCollision();
+      updateMonCoords();
+    }
+
+    function syncSlidersToState() {
+      document.getElementById('input-x').value = state.toolX;
+      document.getElementById('input-y').value = state.toolY;
+      document.getElementById('input-z').value = state.toolZ;
+      
+      document.getElementById('val-x').textContent = state.toolX.toFixed(1) + ' mm';
+      document.getElementById('val-y').textContent = state.toolY.toFixed(1) + ' mm';
+      document.getElementById('val-z').textContent = state.toolZ.toFixed(1) + ' mm';
+    }
+
+    function disableInputs(disable) {
+      document.getElementById('input-x').disabled = disable;
+      document.getElementById('input-y').disabled = disable;
+      document.getElementById('input-z').disabled = disable;
+      document.getElementById('btn-prog-circle').disabled = disable;
+      document.getElementById('btn-prog-zigzag').disabled = disable;
+      document.getElementById('btn-prog-square').disabled = disable;
+      document.getElementById('btn-reset-block').disabled = disable;
+    }
+
+    // Bucle de animación principal
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+
+      // Rotar husillo / Fresa si está encendido
+      if (state.spindleOn) {
+        // Transición de RPM
+        state.spindleRPM += (state.targetRPM - state.spindleRPM) * 0.1;
+        
+        // Rotar fresa según velocidad real
+        const rotSpeed = (state.spindleRPM / 60) * Math.PI * 2 * delta;
+        bitMesh.rotation.y += rotSpeed;
+        
+        // Efecto visual en mandril
+        spindleMesh.children[1].rotation.y += rotSpeed;
+      } else {
+        state.spindleRPM += (0 - state.spindleRPM) * 0.15;
+      }
+
+      // Procesar trayectorias CNC activas
+      tickProgram(delta);
+
+      // Procesar partículas chispas
+      updateParticles(delta);
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Manejar cambios en tamaño de ventana
+    function onWindowResize() {
+      const container = document.querySelector('.viewport-container');
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    // Iniciar al cargar DOM
+    window.addEventListener('DOMContentLoaded', () => {
+      init();
+    });
+  </script>
+</body>
+</html>

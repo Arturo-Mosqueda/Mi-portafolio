@@ -345,39 +345,15 @@ body.light .cad-viewport:hover {
   line-height: 1.4;
   pointer-events: none;
 }
-.cad-object-wrap {
-  transform-style: preserve-3d;
-  animation: rotateCad 15s linear infinite;
-  pointer-events: none;
-}
-@keyframes rotateCad {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
-}
-.cad-object {
-  width: 64px;
-  height: 64px;
-  position: relative;
-  transform-style: preserve-3d;
-}
-.cad-object .face {
+#hero-cnc-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
   position: absolute;
   inset: 0;
-  border: 1.5px solid var(--fg);
-  background: rgba(255, 255, 255, 0.015);
-  opacity: 0.85;
-  transition: border-color var(--t);
+  z-index: 1;
+  pointer-events: none;
 }
-body.light .cad-object .face {
-  border-color: var(--fg);
-  background: rgba(0, 0, 0, 0.005);
-}
-.cad-object .face.front  { transform: translateZ(32px); }
-.cad-object .face.back   { transform: rotateY(180deg) translateZ(32px); }
-.cad-object .face.left   { transform: rotateY(-90deg) translateZ(32px); }
-.cad-object .face.right  { transform: rotateY(90deg) translateZ(32px); }
-.cad-object .face.top    { transform: rotateX(90deg) translateZ(32px); }
-.cad-object .face.bottom { transform: rotateX(-90deg) translateZ(32px); }
 
 .home-intro {
   max-width: 600px;
@@ -870,6 +846,14 @@ body.light .proj-card:hover {
   padding-top: 0.2rem;
 }
 
+.proj-date {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .proj-status {
   font-family: var(--mono);
   font-size: 0.56rem;
@@ -1065,28 +1049,72 @@ body.light .cert-card:hover {
 
 .book-card {
   cursor: pointer;
-  transition: opacity var(--t);
 }
-.book-card:hover { opacity: 0.6; }
 
 .book-cover-wrap {
+  position: relative;
   aspect-ratio: 2/3;
   overflow: hidden;
   background: var(--bg-3);
   border: 1px solid var(--line);
-  border-radius: 3px;
-  margin-bottom: 0.75rem;
+  border-radius: 4px;
+  transition: transform var(--t), border-color var(--t), box-shadow var(--t);
 }
+.book-card:hover .book-cover-wrap {
+  transform: translateY(-4px) scale(1.04);
+  border-color: var(--fg-2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
 .book-cover {
   width: 100%; height: 100%;
   object-fit: cover;
-  transition: transform var(--t), opacity var(--t);
+  transition: opacity var(--t);
 }
-.book-card:hover .book-cover { transform: scale(1.03); opacity: 0.85; }
+.book-card:hover .book-cover {
+  opacity: 0.3;
+}
 
-.book-title { font-size: 0.8rem; font-weight: 500; color: var(--fg); line-height: 1.3; margin-bottom: 0.2rem; }
-.book-author { font-size: 0.7rem; color: var(--fg-2); margin-bottom: 0.2rem; }
-.book-stars { font-size: 0.63rem; color: var(--fg-3); letter-spacing: 1px; }
+.book-hover-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity var(--t);
+  pointer-events: none;
+  background: rgba(9, 13, 22, 0.45);
+  backdrop-filter: blur(3px);
+  padding: 0.5rem;
+}
+.book-card:hover .book-hover-overlay {
+  opacity: 1;
+}
+
+.book-hover-stars {
+  font-size: 1.15rem;
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.45);
+  letter-spacing: 2px;
+}
+
+.book-hover-status {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--fg-2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.book-title { display: none; }
+.book-author { display: none; }
+.book-stars { display: none; }
 
 /* =====================================================
    READER

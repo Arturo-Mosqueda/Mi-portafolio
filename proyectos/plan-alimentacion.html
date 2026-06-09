@@ -6,23 +6,37 @@
     <title>Plan Nutricional UNAQ</title>
     <!-- Librería para exportar a imagen -->
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #e74c3c;
-            --secondary: #34495e;
-            --bg: #f4f7f6;
+            --primary: #0f172a; /* Slate 900 */
+            --primary-light: #1e293b; /* Slate 800 */
+            --accent: #10b981; /* Emerald 500 */
+            --accent-hover: #059669;
+            --secondary: #475569; /* Slate 600 */
+            --bg: #f8fafc; /* Slate 50 */
             --card-bg: #ffffff;
-            --border: #ddd;
-            --text: #333;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #c0392b;
+            --border: #e2e8f0; /* Slate 200 */
+            --text: #0f172a; /* Slate 900 */
+            --text-muted: #64748b; /* Slate 500 */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             
             /* Colores Macros */
-            --color-prot: #3498db;
-            --color-fat: #f1c40f;
-            --color-carb: #1abc9c;
+            --color-prot: #3b82f6; /* Blue 500 */
+            --color-fat: #eab308; /* Yellow 500 */
+            --color-carb: #14b8a6; /* Teal 500 */
+
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --radius-sm: 6px;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
 
         * {
@@ -30,17 +44,18 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg);
             margin: 0;
             padding: 20px;
             color: var(--text);
-            padding-bottom: 300px;
+            padding-bottom: 150px;
+            line-height: 1.5;
         }
 
         /* Layout Principal */
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -48,11 +63,12 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
         }
 
         @media (min-width: 768px) {
@@ -63,8 +79,20 @@
             }
         }
 
-        h1 { margin: 0; font-size: 1.8rem; color: var(--primary); }
-        h1 span { font-size: 0.6em; color: #7f8c8d; font-weight: normal; display: block; margin-top: 5px; }
+        h1 { 
+            margin: 0; 
+            font-size: 1.6rem; 
+            color: var(--primary); 
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        h1 span { 
+            font-size: 0.65em; 
+            color: var(--text-muted); 
+            font-weight: 500; 
+            display: block; 
+            margin-top: 6px; 
+        }
 
         .controls {
             display: flex;
@@ -73,152 +101,209 @@
         }
 
         .btn {
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            border: 1px solid transparent;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
         }
 
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-        .btn:active { transform: translateY(0); }
+        .btn:hover { 
+            transform: translateY(-1px); 
+            box-shadow: var(--shadow-md); 
+        }
+        .btn:active { 
+            transform: translateY(0); 
+        }
 
-        .btn-random { background: #e67e22; }
-        .btn-export { background: #27ae60; }
-        .btn-clear { background: #c0392b; }
-        .btn-add { background: #3498db; }
-        .btn-reset-recipes { background: #7f8c8d; font-size: 0.8rem; }
+        .btn-random { background: #d97706; } /* Orange 600 */
+        .btn-random:hover { background: #b45309; }
+        .btn-export { background: var(--accent); }
+        .btn-export:hover { background: var(--accent-hover); }
+        .btn-clear { background: var(--danger); }
+        .btn-clear:hover { background: #dc2626; }
+        .btn-add { background: #2563eb; } /* Blue 600 */
+        .btn-add:hover { background: #1d4ed8; }
+        .btn-reset-recipes { 
+            background: transparent; 
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            box-shadow: none;
+        }
+        .btn-reset-recipes:hover {
+            background: #f1f5f9;
+            color: var(--text);
+            box-shadow: none;
+        }
         
         /* Notificaciones */
         #notification-area {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
         }
         .toast {
-            background: #333;
+            background: var(--primary);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
             margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease-out;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            min-width: 250px;
+            min-width: 280px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Selector de Día en Celular */
+        .mobile-day-selector {
+            display: none;
+            gap: 6px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 6px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+        .mobile-day-selector::-webkit-scrollbar {
+            display: none; /* Safari & Chrome */
+        }
+        .mobile-day-btn {
+            flex: 1;
+            border: none;
+            padding: 10px 14px;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            min-width: 75px;
+        }
+        .mobile-day-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
         }
 
         /* Estructura del Grid Semanal */
         .planner-wrapper {
             overflow-x: auto;
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
             margin-bottom: 30px;
-            /* Sticky Header Logic */
             position: relative;
         }
 
         .weekly-grid {
             display: grid;
-            grid-template-columns: 80px repeat(7, minmax(180px, 1fr));
-            gap: 8px;
+            grid-template-columns: 90px repeat(7, minmax(180px, 1fr));
+            gap: 10px;
             min-width: 1200px; 
         }
 
         /* Encabezados Sticky */
         .header-day {
             text-align: center;
-            font-weight: bold;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            border-radius: 6px;
+            font-weight: 600;
+            padding: 14px;
+            background: #f1f5f9;
+            color: var(--primary);
+            border-radius: var(--radius-md);
             text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            /* Sticky solo dentro del planner */
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
             position: sticky;
             top: 0;
             z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
         }
         
         .header-cat {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            background: var(--secondary);
+            font-weight: 700;
+            background: var(--primary-light);
             color: white;
-            border-radius: 6px;
+            border-radius: var(--radius-md);
             writing-mode: vertical-lr;
             transform: rotate(180deg);
-            padding: 10px 0;
-            font-size: 0.85rem;
+            padding: 12px 0;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 0.15em;
         }
 
         .header-total {
-            background: #2c3e50;
-            border: 2px solid #2c3e50;
+            background: var(--primary);
+            border: 1px solid var(--primary);
         }
 
         /* Celdas de Comida */
         .meal-slot {
-            background: #f8f9fa;
-            border: 2px dashed #e0e0e0;
-            border-radius: 8px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
             min-height: 140px;
-            padding: 8px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             position: relative;
         }
 
         .meal-slot:hover {
-            border-color: #bdc3c7;
-            background: #fff;
+            border-color: #94a3b8;
+            background: #f1f5f9;
         }
 
         .meal-slot.drag-over {
             border-color: var(--accent);
-            background: #fdf2f0;
+            background: #ecfdf5;
         }
 
         /* Celda de Totales */
         .total-slot {
-            background: #ecf0f1;
-            border: 1px solid #bdc3c7;
-            border-radius: 8px;
-            padding: 10px;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px 10px;
             display: flex;
             flex-direction: column;
             font-size: 0.8rem;
-            gap: 6px;
+            gap: 8px;
         }
 
         .stat-block {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
         .stat-row {
@@ -227,22 +312,22 @@
             align-items: center;
         }
         
-        .stat-label { font-weight: bold; color: #555; font-size: 0.8rem; }
-        .stat-val { font-family: monospace; font-weight: bold; font-size: 0.85rem; }
+        .stat-label { font-weight: 600; color: var(--text-muted); font-size: 0.75rem; }
+        .stat-val { font-family: monospace; font-weight: 700; font-size: 0.85rem; color: var(--primary); }
         
         /* Barras de Progreso */
         .progress-track {
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 9999px;
             overflow: hidden;
             width: 100%;
         }
         .progress-fill {
             height: 100%;
             width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 9999px;
         }
 
         .fill-cal { background-color: var(--success); }
@@ -250,143 +335,197 @@
         .fill-fat { background-color: var(--color-fat); }
         .fill-carb { background-color: var(--color-carb); }
 
-        .stat-status { font-size: 0.7em; text-align: center; margin-top: 2px; font-style: italic; color: #777;}
-
+        .stat-status { 
+            font-size: 0.7rem; 
+            text-align: center; 
+            margin-top: 1px; 
+            font-weight: 600;
+            color: var(--text-muted);
+        }
 
         /* Tarjeta de Receta dentro del slot */
         .recipe-card {
             background: white;
             border-left: 4px solid var(--accent);
-            padding: 10px;
+            padding: 12px;
             font-size: 0.85rem;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            cursor: pointer;
-            margin-bottom: 6px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            cursor: grab;
+            margin-bottom: 8px;
             position: relative;
-            transition: transform 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
         
         .recipe-card:active { cursor: grabbing; }
-        .recipe-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .recipe-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-md); 
+        }
 
-        .recipe-card h4 { margin: 0 0 4px 0; font-size: 0.95rem; color: #2c3e50; pointer-events: none; }
-        .recipe-card .meta { display: flex; justify-content: space-between; color: #7f8c8d; font-size: 0.75rem; font-weight: bold; pointer-events: none; }
-        .recipe-card .desc { margin-top: 4px; color: #95a5a6; font-size: 0.75rem; line-height: 1.3; pointer-events: none; }
+        .recipe-card h4 { 
+            margin: 0 0 6px 0; 
+            font-size: 0.9rem; 
+            color: var(--primary); 
+            font-weight: 600;
+            line-height: 1.3;
+            pointer-events: none; 
+        }
+        .recipe-card .meta { 
+            display: flex; 
+            justify-content: space-between; 
+            color: var(--text-muted); 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            pointer-events: none; 
+        }
+        .recipe-card .desc { 
+            margin-top: 6px; 
+            color: var(--text-muted); 
+            font-size: 0.75rem; 
+            line-height: 1.4; 
+            pointer-events: none; 
+        }
 
         /* Icono de imagen en la tarjeta pequeña */
         .has-img-indicator {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 6px;
+            right: 8px;
             font-size: 10px;
+            opacity: 0.7;
         }
 
         .delete-btn {
             position: absolute;
             top: -8px;
             right: -8px;
-            background: #e74c3c;
+            background: var(--danger);
             color: white;
             border: none;
-            width: 22px;
-            height: 22px;
-            line-height: 20px;
+            width: 20px;
+            height: 20px;
+            line-height: 18px;
             text-align: center;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0;
             transition: opacity 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-sm);
             z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
         }
         .recipe-card:hover .delete-btn { opacity: 1; }
 
         /* Banco de Alimentos */
         .food-bank {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
         }
         
         .bank-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 18px;
             margin-bottom: 20px;
         }
 
-        .bank-header h2 { margin: 0; font-size: 1.4rem; }
+        .bank-header h2 { 
+            margin: 0; 
+            font-size: 1.3rem; 
+            font-weight: 700;
+            color: var(--primary);
+        }
 
         .bank-categories {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
         }
 
         .bank-column {
-            background: #fdfdfd;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #eee;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
         }
         
         .bank-column h3 {
             text-align: center;
-            border-bottom: 3px solid;
+            border-bottom: 2px solid;
             padding-bottom: 8px;
             margin-top: 0;
-            font-size: 1rem;
-            color: #555;
+            font-size: 0.85rem;
+            color: var(--text-muted);
             text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
         }
 
         .draggable-source {
             margin-bottom: 10px;
-            border: 1px solid #eee;
+            border: 1px solid var(--border);
         }
 
         /* Colores por Categoría */
-        .cat-desayuno { border-left-color: #f1c40f; } .col-desayuno h3 { border-color: #f1c40f; }
-        .cat-lunch { border-left-color: #3498db; } .col-lunch h3 { border-color: #3498db; }
-        .cat-comida { border-left-color: #e67e22; } .col-comida h3 { border-color: #e67e22; }
-        .cat-colacion { border-left-color: #9b59b6; } .col-colacion h3 { border-color: #9b59b6; }
-        .cat-cena { border-left-color: #2ecc71; } .col-cena h3 { border-color: #2ecc71; }
-        .cat-extra { border-left-color: #ff7675; } .col-extra h3 { border-color: #ff7675; }
+        .cat-desayuno { border-left-color: #f59e0b; } .col-desayuno h3 { border-color: #f59e0b; }
+        .cat-lunch { border-left-color: #3b82f6; } .col-lunch h3 { border-color: #3b82f6; }
+        .cat-comida { border-left-color: #ea580c; } .col-comida h3 { border-color: #ea580c; }
+        .cat-colacion { border-left-color: #a855f7; } .col-colacion h3 { border-color: #a855f7; }
+        .cat-cena { border-left-color: #10b981; } .col-cena h3 { border-color: #10b981; }
+        .cat-extra { border-left-color: #f43f5e; } .col-extra h3 { border-color: #f43f5e; }
 
         /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.25s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
         /* Modales */
         .modal {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
+            padding: 24px;
+            border-radius: var(--radius-lg);
             width: 95%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 480px;
+            box-shadow: var(--shadow-lg);
             position: relative;
             max-height: 90vh;
             overflow-y: auto;
+            border: 1px solid var(--border);
         }
 
-        .modal h3 { margin-top: 0; color: var(--primary); margin-bottom: 15px; text-align: center;}
+        .modal h3 { 
+            margin-top: 0; 
+            color: var(--primary); 
+            margin-bottom: 20px; 
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+        }
         
         /* Imagen en Modal */
         .recipe-img-container {
@@ -396,11 +535,11 @@
 
         .recipe-img-preview {
             width: 100%;
-            height: 250px;
+            height: 200px;
             object-fit: cover;
-            border-radius: 8px;
-            background: #eee;
-            border: 1px solid #ddd;
+            border-radius: var(--radius-md);
+            background: #f1f5f9;
+            border: 1px solid var(--border);
         }
 
         /* Botón mini de eliminar foto */
@@ -408,21 +547,22 @@
             position: absolute;
             top: 8px;
             right: 8px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(15, 23, 42, 0.7);
             color: white;
             border: none;
             width: 24px;
             height: 24px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
+            font-weight: bold;
         }
         .btn-mini-remove:hover {
-            background: #e74c3c;
+            background: var(--danger);
         }
         
         /* Input File personalizado */
@@ -432,34 +572,119 @@
         }
         .file-input-wrapper input[type="file"] {
             width: 100%;
-            padding: 10px;
-            background: #f9f9f9;
-            border: 1px dashed #ccc;
-            border-radius: 6px;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: var(--radius-md);
             cursor: pointer;
+            font-size: 0.85rem;
         }
 
         /* Formulario Receta */
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; font-size: 0.9rem; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .form-group input[type="text"], 
         .form-group input[type="number"], 
         .form-group textarea, 
         .form-group select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: #f8fafc;
+            outline: none;
+            transition: all 0.2s;
         }
-        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-group input:focus, 
+        .form-group textarea:focus, 
+        .form-group select:focus {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
 
         .macros-row { display: flex; gap: 10px; }
         .macros-row .form-group { flex: 1; }
 
-        .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+        .modal-actions { 
+            margin-top: 24px; 
+            display: flex; 
+            gap: 10px; 
+            justify-content: flex-end; 
+            border-top: 1px solid var(--border);
+            padding-top: 18px;
+        }
 
+        /* Responsividad móvil */
+        @media (max-width: 767px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            .planner-wrapper {
+                padding: 10px;
+                margin-bottom: 20px;
+            }
+            .weekly-grid {
+                grid-template-columns: 80px 1fr !important;
+                min-width: 0 !important;
+                gap: 8px !important;
+            }
+            .header-day {
+                display: none !important;
+            }
+            .meal-slot {
+                display: none !important;
+                min-height: 120px !important;
+                padding: 6px !important;
+            }
+            .total-slot {
+                display: none !important;
+                padding: 8px !important;
+            }
+            
+            /* Mostrar solo el día activo en celular */
+            .weekly-grid.active-day-0 [data-day="0"], .weekly-grid.active-day-0 #total-slot-0 { display: flex !important; }
+            .weekly-grid.active-day-1 [data-day="1"], .weekly-grid.active-day-1 #total-slot-1 { display: flex !important; }
+            .weekly-grid.active-day-2 [data-day="2"], .weekly-grid.active-day-2 #total-slot-2 { display: flex !important; }
+            .weekly-grid.active-day-3 [data-day="3"], .weekly-grid.active-day-3 #total-slot-3 { display: flex !important; }
+            .weekly-grid.active-day-4 [data-day="4"], .weekly-grid.active-day-4 #total-slot-4 { display: flex !important; }
+            .weekly-grid.active-day-5 [data-day="5"], .weekly-grid.active-day-5 #total-slot-5 { display: flex !important; }
+            .weekly-grid.active-day-6 [data-day="6"], .weekly-grid.active-day-6 #total-slot-6 { display: flex !important; }
+
+            .header-cat {
+                writing-mode: horizontal-tb !important;
+                transform: none !important;
+                padding: 8px 4px !important;
+                font-size: 0.7rem !important;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .header-cat.header-total {
+                font-size: 0.65rem !important;
+            }
+            .food-bank {
+                padding: 16px;
+            }
+            .bank-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+                text-align: center;
+            }
+            .bank-categories {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -545,6 +770,7 @@
         </div>
 
         <div class="modal-actions">
+            <button class="btn btn-add" id="btn-add-to-plan" onclick="addRecipeToActiveDay()" style="display:none;">Añadir al Plan</button>
             <button class="btn" style="background:#95a5a6" onclick="closeRecipeModal()">Cancelar</button>
             <button class="btn btn-export" onclick="saveRecipeFromModal()">Guardar Cambios</button>
         </div>
@@ -555,6 +781,9 @@
     <header>
         <div>
             <h1>Dashboard Nutricional <span>Plan de Volumen: 3700-3900 kcal</span></h1>
+            <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 6px; font-weight: 500;">
+                🖥️ Recomendado para versión de escritorio
+            </div>
         </div>
         <div class="controls">
             <button class="btn btn-clear" onclick="askClearGrid()">
@@ -571,6 +800,9 @@
             </button>
         </div>
     </header>
+
+    <!-- Selector de día móvil -->
+    <div class="mobile-day-selector" id="mobile-day-selector"></div>
 
     <!-- Área Principal: Calendario -->
     <div id="capture-area" class="planner-wrapper">
@@ -683,7 +915,8 @@
         buildGrid();
         buildBank();
         loadState();
-        showNotification("¡Listo! Toca una receta para editarla.");
+        buildMobileDaySelector();
+        showNotification("¡Listo! Toca una receta para editarla o añadirla.");
     });
 
     // Cargar librería de recetas (LocalStorage o Default)
@@ -970,6 +1203,60 @@
     let originalDataId = null;
     let currentBase64Img = ""; // Variable para guardar la imagen codificada
 
+    let activeDayMobile = 0; // Día seleccionado en móvil (0 = Lunes)
+
+    function buildMobileDaySelector() {
+        const selector = document.getElementById('mobile-day-selector');
+        if (!selector) return;
+        selector.innerHTML = '';
+        days.forEach((day, index) => {
+            const btn = document.createElement('button');
+            btn.className = `mobile-day-btn ${index === activeDayMobile ? 'active' : ''}`;
+            btn.innerText = day.substring(0, 3); // "Lun", "Mar", etc.
+            btn.onclick = () => {
+                activeDayMobile = index;
+                document.querySelectorAll('.mobile-day-btn').forEach((b, idx) => {
+                    b.classList.toggle('active', idx === index);
+                });
+                updateMobileGridClass();
+            };
+            selector.appendChild(btn);
+        });
+        updateMobileGridClass();
+    }
+
+    function updateMobileGridClass() {
+        const grid = document.getElementById('grid-container');
+        if (!grid) return;
+        for (let i = 0; i < 7; i++) {
+            grid.classList.remove(`active-day-${i}`);
+        }
+        grid.classList.add(`active-day-${activeDayMobile}`);
+    }
+
+    function addRecipeToActiveDay() {
+        const cat = document.getElementById('recipe-cat').value;
+        const day = activeDayMobile;
+        const slot = document.getElementById(`slot-${day}-${cat}`);
+        if (slot) {
+            const data = {
+                id: originalDataId,
+                name: document.getElementById('recipe-name').value || "Sin Nombre",
+                cat: cat,
+                cal: parseInt(document.getElementById('recipe-cal').value) || 0,
+                p: parseInt(document.getElementById('recipe-prot').value) || 0,
+                g: parseInt(document.getElementById('recipe-fat').value) || 0,
+                c: parseInt(document.getElementById('recipe-carbs').value) || 0,
+                desc: document.getElementById('recipe-desc').value || "",
+                img: currentBase64Img
+            };
+            addMealToSlot(slot, data);
+            saveState();
+            showNotification(`Receta añadida al ${days[day]} (${cat})`);
+            closeRecipeModal();
+        }
+    }
+
     function openRecipeModal(element, dataObj) {
         currentEditingElement = element;
         isCreatingNew = false;
@@ -983,7 +1270,14 @@
         originalDataId = data.id; 
 
         fillModal(data);
-        document.getElementById('recipe-modal-title').innerText = "Editar / Ver Receta";
+        
+        const openedFromSlot = !!(element && element.closest && element.closest('.meal-slot'));
+        const btnAddToPlan = document.getElementById('btn-add-to-plan');
+        if (btnAddToPlan) {
+            btnAddToPlan.style.display = openedFromSlot ? 'none' : 'block';
+        }
+
+        document.getElementById('recipe-modal-title').innerText = isCreatingNew ? "Crear Nueva Receta" : "Editar / Ver Receta";
         recipeModal.classList.add('active');
     }
 

@@ -17,6 +17,9 @@
       <div>
         <h1 class="app-title">ROBOARM 3-DOF</h1>
         <p class="app-subtitle">Sistema Mecatrónico de Control</p>
+        <div style="margin-top: 5px; display: inline-flex; align-items: center; gap: 4px; font-size: 0.65rem; color: #d97706; background: rgba(217, 119, 6, 0.1); border: 1px solid rgba(217, 119, 6, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: 500; font-family: 'Inter', sans-serif;">
+          🖥️ Recomendado para versión de escritorio
+        </div>
       </div>
     </div>
     <div class="header-center">
@@ -38,11 +41,18 @@
     </div>
   </header>
 
+  <!-- Pestañas de Navegación Móvil -->
+  <div class="mobile-tabs" id="mobile-arm-tabs">
+    <button class="mobile-tab-btn active" data-target="panel-control">🎮 Control</button>
+    <button class="mobile-tab-btn" data-target="panel-mcu">⚡ Sistema</button>
+    <button class="mobile-tab-btn" data-target="panel-sim">🤖 Simulación</button>
+  </div>
+
   <!-- MAIN LAYOUT -->
   <main id="app-main">
 
     <!-- PANEL IZQUIERDO: Garra de Control -->
-    <section class="panel" id="panel-control">
+    <section class="panel mobile-active" id="panel-control">
       <div class="panel-header">
         <h2>🎮 GARRA DE CONTROL</h2>
         <span class="panel-tag">ENTRADA</span>
@@ -260,5 +270,22 @@
   <script src="renderer.js"></script>
   <script src="schematic.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Control de pestañas para celular
+    document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-target');
+        document.querySelectorAll('.panel').forEach(panel => {
+          if (panel.id === targetId) {
+            panel.classList.add('mobile-active');
+          } else {
+            panel.classList.remove('mobile-active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

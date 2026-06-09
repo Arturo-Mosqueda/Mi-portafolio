@@ -709,3 +709,97 @@ canvas {
 /* Workspace object legend */
 .ws-legend { display: flex; gap: 10px; padding: 4px 8px; font-size: 9px; font-family: var(--font-code); }
 .ws-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 3px; }
+
+/* ===== MOBILE TABS NAVIGATION SYSTEM ===== */
+.mobile-tabs {
+  display: none;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 6px;
+  gap: 6px;
+}
+.mobile-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-head);
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+.mobile-tab-btn.active {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+@media (max-width: 767px) {
+  #app-header {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+  .header-left {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .header-center {
+    width: 100%;
+    justify-content: center;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .mobile-tabs {
+    display: flex;
+  }
+  #app-main {
+    grid-template-columns: 1fr !important;
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+  .panel {
+    display: none !important;
+    border-right: none;
+    height: 100%;
+  }
+  .panel.mobile-active {
+    display: flex !important;
+  }
+  
+  /* Sliders más grandes para toque en móvil */
+  .angle-slider {
+    height: 8px !important;
+  }
+  .angle-slider::-webkit-slider-thumb {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .angle-row {
+    padding: 6px 0;
+  }
+  
+  .target-inputs {
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  /* Ajustar layouts internos */
+  .canvas-wrapper {
+    margin: 0 auto;
+    max-width: 420px;
+    width: 100%;
+  }
+}

@@ -7,6 +7,7 @@ const PROJECTS = [
     description: "Simulacion interactiva visual de impactos de asteroides reales y sus efectos ecologicos y fisicos sobre la Tierra. Desarrollado para el NASA Space Apps Challenge.",
     tags: ["JavaScript", "HTML5 Canvas", "Fisica", "NASA Data"],
     status: "live",
+    date: "Octubre 2025",
     github: "https://github.com/Arturo-Mosqueda",
     live: "./proyectos/simulador-asteroides/index.html",
     imageUrl: "./proyectos/simulador-asteroides/screenshot.png",
@@ -18,6 +19,7 @@ const PROJECTS = [
     description: "Mapa interactivo para la visualizacion historica y espacial de la contaminacion del aire en la zona metropolitana de Queretaro, facilitando el analisis temporal de emisiones.",
     tags: ["Leaflet.js", "JavaScript", "HTML/CSS", "APIs"],
     status: "live",
+    date: "Diciembre 2025",
     github: "https://github.com/ExoBUckT/Mapeo-de-la-calidad-del-aire-en-Html",
     live: "./proyectos/mapa-contaminacion-qro/index.html",
     imageUrl: "./proyectos/mapa-contaminacion-qro/screenshot.png",
@@ -29,6 +31,7 @@ const PROJECTS = [
     description: "Interfaz web y logica de control para la manipulacion y calibracion en tiempo real de una garra robotica articulada accionada por servomotores.",
     tags: ["Electronica", "Microcontroladores", "IoT", "JavaScript"],
     status: "live",
+    date: "Enero 2026",
     github: "https://github.com/Arturo-Mosqueda",
     live: "./proyectos/garra-servomotor/index.html",
     imageUrl: "./proyectos/garra-servomotor/screenshot.png",
@@ -40,6 +43,7 @@ const PROJECTS = [
     description: "Aplicacion web personal para la planificacion y seguimiento de nutricion, macronutrientes y habitos alimenticios saludables.",
     tags: ["HTML", "CSS", "JavaScript", "Nutricion"],
     status: "live",
+    date: "Noviembre 2026",
     github: "",
     live: "./proyectos/plan-alimentacion.html",
     imageUrl: "./proyectos/screenshot-plan.png",
@@ -51,6 +55,7 @@ const PROJECTS = [
     description: "Proyecto integrador. Ingenieria Aeronautica en Manufactura (El Marques, Qro). Diseno y modelado CAD de un fixture metrologico para la sujecion y posicionamiento de bujes aeronauticos, orientado a mejorar la precision y repetibilidad de las inspecciones dimensionales (En proceso).",
     tags: ["SolidWorks", "Diseno CAD", "Metrologia", "Aeronautica"],
     status: "concept",
+    date: "Mayo 2026",
     github: "",
     live: "",
     imageUrl: "./proyectos/screenshot-fixture.png",
@@ -62,6 +67,7 @@ const PROJECTS = [
     description: "Sistema automatizado con control de electrovalvulas, garra automatica y programacion de microcontrolador PIC4550. Proyecto de graduacion de Mecatronica.",
     tags: ["Mecatronica", "PIC4550", "Electronica", "C++"],
     status: "concept",
+    date: "Julio 2024",
     github: "",
     live: "",
     imageUrl: "./proyectos/screenshot-mezclador.png",
@@ -77,7 +83,7 @@ const CERTIFICATIONS = [
     date: "Marzo 2026",
     category: "Diseno CAD / SolidWorks",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswp-s1.png"
   },
   {
     id: "cert-cswp-s2",
@@ -86,7 +92,7 @@ const CERTIFICATIONS = [
     date: "En proceso",
     category: "Diseno CAD / SolidWorks",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswp-s2.png"
   },
   {
     id: "cert-cswp-s3",
@@ -95,7 +101,7 @@ const CERTIFICATIONS = [
     date: "En proceso",
     category: "Diseno CAD / SolidWorks",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1537462715879-360eeb61a0bc?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswp-s3.png"
   },
   {
     id: "cert-cswa",
@@ -104,7 +110,7 @@ const CERTIFICATIONS = [
     date: "En proceso",
     category: "Diseno CAD / SolidWorks",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswa.png"
   },
   {
     id: "cert-cswp-sheetmetal",
@@ -113,7 +119,7 @@ const CERTIFICATIONS = [
     date: "En proceso",
     category: "Diseno CAD / Especialidad",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1513828742140-ccaa34f3be09?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswp-sheetmetal.png"
   },
   {
     id: "cert-cswp-cam",
@@ -122,7 +128,7 @@ const CERTIFICATIONS = [
     date: "En proceso",
     category: "Manufactura / CNC",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1565087169640-6f1e68c4d427?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswp-cam.png"
   },
   {
     id: "cert-cswp-am",
@@ -131,51 +137,24 @@ const CERTIFICATIONS = [
     date: "En proceso",
     category: "Manufactura Aditiva / 3D",
     credentialUrl: "https://virtualtester.com",
-    imageUrl: "https://images.unsplash.com/photo-1615840287214-7fe58a8b668f?q=80&w=600&auto=format&fit=crop"
+    imageUrl: "./proyectos/certificaciones/cswp-am.png"
   }
 ];
 
 const BOOKS = [
+
   {
-    id: "book-mas-libros",
-    title: "Mas Libros y Menos Pantallas",
-    author: "Michel Desmurget",
-    rating: 0,
-    categories: ["Educacion", "Tecnologia"],
-    coverUrl: "https://covers.openlibrary.org/b/isbn/9788434432666-M.jpg",
-    quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">En proceso de lectura</p><p>Desmurget desmonta con datos el mito de que las pantallas son neutras para el desarrollo cognitivo. Argumenta a favor de recuperar la lectura profunda como herramienta indispensable.</p>"
-  },
-  {
-    id: "book-racionalidad",
-    title: "Racionalidad",
+    id: "book-defensa-ilustracion",
+    title: "En defensa de la ilustracion",
     author: "Steven Pinker",
-    rating: 0,
+    rating: 5,
     categories: ["Pensamiento Critico", "Ciencia"],
-    coverUrl: "https://covers.openlibrary.org/b/isbn/0525561994-M.jpg",
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9788449334627-M.jpg",
     quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">Proximamente</p><p>Por que los humanos, capaces de razonar brillantemente, caemos en el pensamiento irracional? Un recorrido por la logica, estadistica y sesgos cognitivos.</p>"
+    summary: "<p>Pinker demuestra con datos convincentes que la salud, prosperidad, seguridad y felicidad global han mejorado drasticamente gracias a la razon, la ciencia y el humanismo.</p>"
   },
-  {
-    id: "book-morir-cero",
-    title: "Morir con Cero",
-    author: "Bill Perkins",
-    rating: 0,
-    categories: ["Finanzas Personales", "Filosofia de Vida"],
-    coverUrl: "https://covers.openlibrary.org/b/isbn/0358567971-M.jpg",
-    quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">Proximamente</p><p>Perkins propone maximizar experiencias de vida en lugar de acumular riqueza. El objetivo no es morir rico, sino haber vivido al maximo con los recursos que tuviste.</p>"
-  },
-  {
-    id: "book-how-to-know-person",
-    title: "How to Know a Person",
-    author: "David Brooks",
-    rating: 0,
-    categories: ["Relaciones Humanas", "Desarrollo Personal"],
-    coverUrl: "https://covers.openlibrary.org/b/isbn/059323046X-M.jpg",
-    quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">Proximamente</p><p>El arte de realmente conocer a otra persona: escuchar con profundidad, hacer las preguntas correctas y crear conexiones genuinas en un mundo cada vez mas superficial.</p>"
-  },
+
+
   {
     id: "book-pensar-sistemas",
     title: "Pensar en Sistemas",
@@ -184,37 +163,37 @@ const BOOKS = [
     categories: ["Sistemas", "Ingenieria"],
     coverUrl: "https://covers.openlibrary.org/b/isbn/1603580557-M.jpg",
     quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">Proximamente</p><p>Ver el mundo no como eventos aislados sino como sistemas con ciclos de retroalimentacion. Clave para ingenieros y disenadores de soluciones complejas.</p>"
+    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">En proceso de lectura</p><p>Ver el mundo no como eventos aislados sino como sistemas con ciclos de retroalimentacion. Clave para ingenieros y disenadores de soluciones complejas.</p>"
   },
   {
     id: "book-desastre-climatico",
     title: "Como Evitar un Desastre Climatico",
     author: "Bill Gates",
-    rating: 0,
+    rating: 4,
     categories: ["Tecnologia", "Medio Ambiente"],
     coverUrl: "https://covers.openlibrary.org/b/isbn/0385546130-M.jpg",
     quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">Proximamente</p><p>Gates detalla las soluciones tecnologicas y politicas para llegar a cero emisiones. Analisis sector por sector: electricidad, manufactura, agricultura, transporte y construccion.</p>"
+    summary: "<p>Gates detalla las soluciones tecnologicas y politicas para llegar a cero emisiones. Analisis sector por sector: electricidad, manufactura, agricultura, transporte y construccion.</p>"
   },
   {
     id: "book-enfocate",
     title: "Enfocate (Deep Work)",
     author: "Cal Newport",
-    rating: 0,
+    rating: 5,
     categories: ["Productividad", "Trabajo Profundo"],
     coverUrl: "https://covers.openlibrary.org/b/isbn/1455586692-M.jpg",
     quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">En proceso de lectura</p><p>La capacidad de concentrarse sin distracciones en tareas cognitivamente exigentes es la habilidad mas valiosa hoy, y esta desapareciendo justo cuando mas se necesita.</p>"
+    summary: "<p>La capacidad de concentrarse sin distracciones en tareas cognitivamente exigentes es la habilidad mas valiosa hoy, y esta desapareciendo justo cuando mas se necesita.</p>"
   },
   {
     id: "book-ego-enemigo",
     title: "El Ego es el Enemigo",
     author: "Ryan Holiday",
-    rating: 0,
+    rating: 5,
     categories: ["Filosofia", "Estoicismo"],
     coverUrl: "https://covers.openlibrary.org/b/isbn/1591847818-M.jpg",
     quote: "",
-    summary: "<p style=\"font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);margin-bottom:1rem;\">Proximamente</p><p>Inspirado en el estoicismo, Holiday examina como el ego descontrolado sabotea el exito. El antidoto: humildad, trabajo duro y mantenerse orientado al proposito.</p>"
+    summary: "<p>Inspirado en el estoicismo, Holiday examina como el ego descontrolado sabotea el exito. El antidoto: humildad, trabajo duro y mantenerse orientado al proposito.</p>"
   }
 ];
 

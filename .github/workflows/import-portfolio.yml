@@ -1,0 +1,46 @@
+name: Import portfolio backup
+
+on:
+  push:
+    branches:
+      - portfolio-v2-local
+    paths:
+      - .github/workflows/import-portfolio.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: portfolio-v2-local
+          fetch-depth: 0
+
+      - name: Download and restore portfolio
+        env:
+          DRIVE_URL: "https://drive.usercontent.google.com/download?id=1VxU1hQ8uj8i0Hpo2Nn2hRZdRRX9Exqi1&export=download&confirm=t"
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-delay 3 "$DRIVE_URL" -o /tmp/portfolio.zip
+          test -s /tmp/portfolio.zip
+          unzip -t /tmp/portfolio.zip >/dev/null
+          mkdir -p /tmp/portfolio
+          unzip -q /tmp/portfolio.zip -d /tmp/portfolio
+          rsync -a --delete --exclude='.git' --exclude='.github' /tmp/portfolio/ ./
+          rm -f .github/workflows/import-portfolio.yml
+          echo "Restored $(find . -type f -not -path './.git/*' | wc -l) files"
+
+      - name: Commit and push restored portfolio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: publish portfolio v2 CAD gallery"
+          git push origin HEAD:portfolio-v2-local

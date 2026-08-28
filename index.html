@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arturo Mosqueda — Portafolio</title>
-  <meta name="description" content="Portafolio personal de Jesús Arturo Mosqueda Lara — Ing. Aeronáutica, Robótica, CAD, Programación.">
+  <title>Jesús Arturo Mosqueda Lara — Portfolio</title>
+  <meta name="description" content="Portfolio of Jesús Arturo Mosqueda Lara — Aeronautical Manufacturing Engineering, mechanical design, CAD/CAM, automation and programming.">
+  <meta name="theme-color" content="#fafafa">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/style.css">
 </head>
-<body>
+<body class="light">
   <div id="app">
 
     <!-- Top Bar: name + socials + theme -->
@@ -20,21 +21,21 @@
     <nav id="nav-row"></nav>
 
     <!-- Content -->
-    <main id="main">
+    <main id="main" aria-live="polite">
       <div id="content"></div>
     </main>
 
     <!-- Footer -->
     <footer id="footer">
-      <span id="footer-year"></span> Jesús Arturo Mosqueda Lara
+      <span id="footer-year"></span> <span id="footer-name">Jesús Arturo Mosqueda Lara</span>
     </footer>
 
   </div>
 
   <!-- Modal -->
-  <div id="modal-overlay" class="hidden">
+  <div id="modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-label="Credential details">
     <div id="modal-box">
-      <button id="modal-close">✕</button>
+      <button id="modal-close" type="button" aria-label="Close">✕</button>
       <div id="modal-body"></div>
     </div>
   </div>

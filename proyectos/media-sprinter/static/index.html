@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <title>Media Sprinter</title>
+    <link rel="stylesheet" href="/styles.css?v=11" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#download" aria-label="Media Sprinter, inicio">
+          <img src="/logo.png" alt="" width="30" height="30" />
+          <span>Media Sprinter</span>
+        </a>
+        <div class="topbar-right">
+          <div id="healthBadge" class="health-badge" aria-live="polite">
+            <span class="health-dot" aria-hidden="true"></span>
+            <span id="healthText">Comprobando instalación</span>
+          </div>
+          <nav class="top-nav" aria-label="Navegación principal">
+            <button id="tabDownload" class="nav-button is-selected" type="button" aria-current="page">Descargar</button>
+            <button id="tabHistory" class="nav-button" type="button">Historial</button>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section id="downloadView" class="view" aria-labelledby="pageTitle">
+          <div class="intro">
+            <p class="eyebrow">YOUTUBE <span>·</span> INSTAGRAM <span>·</span> X</p>
+            <h1 id="pageTitle">Descarga desde un enlace</h1>
+            <p class="lede">Guarda videos y audio en tu equipo, con la calidad que prefieras.</p>
+          </div>
+
+          <section class="download-panel" aria-label="Nueva descarga">
+            <form id="downloadForm" novalidate>
+              <label class="field-label" for="urlInput">Enlace del video</label>
+              <div class="url-control">
+                <svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M10.6 13.4a4 4 0 0 0 5.65 0l2.12-2.12a4 4 0 1 0-5.66-5.66l-1.06 1.06M13.4 10.6a4 4 0 0 0-5.65 0l-2.12 2.12a4 4 0 1 0 5.66 5.66l1.06-1.06" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+                <input id="urlInput" name="url" type="url" inputmode="url" autocomplete="url" placeholder="Pega un enlace de YouTube, Instagram o X" maxlength="2048" aria-describedby="formHint" required />
+                <button id="pasteButton" class="text-button" type="button">Pegar</button>
+              </div>
+              <p id="formHint" class="form-hint" role="status" aria-live="polite">Las calidades aparecerán después de pegar el enlace.</p>
+              <button id="analysisAction" class="secondary-button is-hidden" type="button">Reintentar análisis</button>
+
+              <section id="mediaPreview" class="media-preview is-hidden" aria-label="Video encontrado">
+                <div class="media-art">
+                  <img id="mediaThumbnail" alt="" />
+                  <span id="mediaFallback" aria-hidden="true">MS</span>
+                </div>
+                <div class="media-copy">
+                  <span id="mediaPlatform" class="media-platform"></span>
+                  <strong id="mediaTitle"></strong>
+                  <small id="mediaDuration"></small>
+                </div>
+                <span id="mediaReady" class="media-ready">Enlace verificado</span>
+              </section>
+
+              <div class="choice-row">
+                <fieldset class="format-fieldset">
+                  <legend>Formato</legend>
+                  <div class="segmented-control">
+                    <label class="format-choice">
+                      <input type="radio" name="mode" value="mp4" checked />
+                      <span>Video <small>MP4</small></span>
+                    </label>
+                    <label class="format-choice">
+                      <input type="radio" name="mode" value="mp3" />
+                      <span>Audio <small>MP3</small></span>
+                    </label>
+                  </div>
+                </fieldset>
+                <div id="qualityField" class="quality-field is-waiting">
+                  <label for="qualitySelect">Calidad</label>
+                  <select id="qualitySelect" name="quality" disabled aria-describedby="formHint audioNote">
+                    <option value="">Pega un enlace primero</option>
+                  </select>
+                </div>
+                <div id="languageField" class="language-field is-hidden">
+                  <label for="audioLanguageSelect">Idioma del audio</label>
+                  <select id="audioLanguageSelect" name="audio_language" disabled aria-describedby="audioLanguageNote">
+                    <option value="">Audio predeterminado</option>
+                  </select>
+                </div>
+              </div>
+              <p id="audioLanguageNote" class="audio-note is-hidden">Solo aparece cuando YouTube ofrece varias pistas de audio.</p>
+              <p id="audioNote" class="audio-note is-hidden">El bitrate elegido no puede superar la calidad de audio del video original.</p>
+
+              <div class="submit-row">
+                <div class="destination-brief">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4l2 2h6a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 18 20H6a2.5 2.5 0 0 1-2.5-2.5v-10Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3.8 10h16.4" stroke="currentColor" stroke-width="1.6"/></svg>
+                  <span>Guardar en <strong id="destinationLabel">D:\Descargas</strong></span>
+                  <button id="editDestinationButton" class="inline-button" type="button">Cambiar</button>
+                </div>
+                <button id="downloadButton" class="primary-button" type="submit" disabled>
+                  <span class="button-label">Descargar</span>
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section id="queueSection" class="queue-section is-hidden" aria-labelledby="queueTitle">
+            <div class="section-heading">
+              <h2 id="queueTitle">Descargas</h2>
+              <span id="queueCount" class="count-badge">0</span>
+            </div>
+            <div id="queueList" class="queue-list" aria-live="polite"></div>
+          </section>
+
+          <details id="settingsDetails" class="settings-panel">
+            <summary>Ajustes y diagnóstico</summary>
+            <div class="settings-content">
+              <label for="destinationInput" class="field-label">Carpeta de destino</label>
+              <div class="destination-control">
+                <input id="destinationInput" type="text" autocomplete="off" spellcheck="false" aria-describedby="settingsHint" />
+                <button id="saveDestinationButton" class="secondary-button" type="button">Guardar carpeta</button>
+              </div>
+              <p id="settingsHint" class="settings-hint" role="status" aria-live="polite">Los archivos completados se guardan en esta carpeta.</p>
+              <div class="diagnostics-row">
+                <div><strong>¿Algo falló?</strong><p>Copia un diagnóstico local sin enlaces ni cookies.</p></div>
+                <button id="copyDiagnosticsButton" class="secondary-button" type="button">Copiar diagnóstico</button>
+              </div>
+            </div>
+          </details>
+
+          <aside class="privacy-note">
+            <span class="privacy-mark" aria-hidden="true">✓</span>
+            <p><strong>Procesamiento local.</strong> Los archivos se validan y se analizan con Microsoft Defender cuando está disponible. Usa contenido que tengas derecho a guardar.</p>
+          </aside>
+        </section>
+
+        <section id="historyView" class="view is-hidden" aria-labelledby="historyTitle">
+          <div class="intro history-intro">
+            <p class="eyebrow">EN ESTE EQUIPO</p>
+            <h1 id="historyTitle">Historial</h1>
+            <p class="lede">Tus descargas recientes y su estado.</p>
+          </div>
+          <div id="historyList" class="history-list" aria-live="polite"></div>
+          <p class="history-footnote">Quitar una entrada del historial no borra el archivo guardado.</p>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>Media Sprinter funciona solo en este equipo.</span>
+        <span>Los enlaces y cookies no se guardan en el historial.</span>
+      </footer>
+    </div>
+    <script src="/app.js?v=11" defer></script>
+  </body>
+</html>
+

@@ -526,6 +526,15 @@ const PROJECTS_V2 = [
     id: "plan-alimentacion", title: { en: "Personal Nutrition Planner", es: "Plan de Alimentación Personal" },
     description: { en: "Personal web application for planning nutrition, macronutrients and healthy habits.", es: "Aplicación web personal para planear nutrición, macronutrientes y hábitos saludables." },
     tags: { en: ["HTML", "CSS", "JavaScript"], es: ["HTML", "CSS", "JavaScript"] }, status: "live", date: { en: "Personal", es: "Personal" }, live: "./proyectos/plan-alimentacion.html", imageUrl: "./proyectos/screenshot-plan.png", fallbackUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: "media-sprinter",
+    title: { en: "Media Sprinter", es: "Media Sprinter" },
+    description: { en: "A Windows desktop app for authorized public media links, with MP4/MP3 output, quality and YouTube audio-track selection, staged progress, queueing and local history.", es: "Aplicación de escritorio para Windows para enlaces públicos autorizados, con salida MP4/MP3, selección de calidad e idioma de audio de YouTube, progreso por etapas, cola e historial local." },
+    tags: { en: ["Python", "yt-dlp", "Desktop app", "Media"], es: ["Python", "yt-dlp", "App de escritorio", "Multimedia"] },
+    status: "live",
+    date: { en: "Oct 2026", es: "Oct 2026" },
+    github: "https://github.com/Arturo-Mosqueda/Mi-portafolio/tree/main/proyectos/media-sprinter"
   }
 ];
 

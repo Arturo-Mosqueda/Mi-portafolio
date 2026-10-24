@@ -1,0 +1,26 @@
+.venv/
+.cache/
+build/
+dist/
+Media Sprinter.exe
+*.exe
+*.dll
+*.pyd
+*.spec
+vendor/
+screenshots/
+documentos-locales/
+downloads/
+temp/
+user-data/
+__pycache__/
+*.py[cod]
+*.log
+*.part
+.env
+.env.*
+*.mp3
+*.mp4
+*.mkv
+*.webm
+*.wav
